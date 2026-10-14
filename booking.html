@@ -157,8 +157,8 @@
         // Load Plan Header dynamically
         async function loadPlanHeader() {
             try {
-                const res = await fetch('/api/config');
-                const db = await res.json();
+           
+                const res = await fetch('https://trikaldarshi-tarot.onrender.com/api/config');
                 window.siteConfig = db;
                 let plan = null;
                 if (planId === 'unlisted' && db.unlistedPlan) {
