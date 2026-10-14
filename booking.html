@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Select Timing | TrikalDarshi Tarot</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="booking.css?v=37">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         .client-input.input-error {
             border: 1.5px solid #ef4444 !important;
@@ -157,6 +159,7 @@
             try {
                 const res = await fetch('/api/config');
                 const db = await res.json();
+                window.siteConfig = db;
                 let plan = null;
                 if (planId === 'unlisted' && db.unlistedPlan) {
                     plan = db.unlistedPlan;
@@ -164,6 +167,7 @@
                     const pIdx = parseInt(planId) || 0;
                     plan = db.plans[pIdx] || db.plans[0];
                 }
+                window.currentPlan = plan;
                 
                 if (plan) {
                     const pPrice = parseInt(plan.price) || 999;
@@ -336,9 +340,21 @@
             document.getElementById('step-1').style.display = 'none';
             document.getElementById('step-2').style.display = 'block';
             
+            const price = getPlanPriceFormatted();
             const btn = document.getElementById('main-action-btn');
-            btn.innerText = 'Confirm Details';
+            btn.innerHTML = `<i class="fa-solid fa-lock" style="margin-right:6px;"></i> Pay ₹${price} & Confirm Slot`;
             btn.setAttribute('onclick', 'startRazorpayPayment(this)');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        }
+
+        function getPlanPriceFormatted() {
+            if (window.currentPlan && window.currentPlan.price) {
+                const num = parseInt(String(window.currentPlan.price).replace(/[^0-9]/g, ''));
+                if (!isNaN(num)) return num;
+            }
+            return 349;
         }
 
         function goToStep1() {
@@ -350,7 +366,7 @@
             btn.setAttribute('onclick', 'goToStep2()');
         }
 
-        // Real Backend Booking Process
+        // Real Backend Razorpay Payment Process
         async function startRazorpayPayment(btn) {
             // Validation
             const nameInput = document.getElementById('client-name');
@@ -402,32 +418,114 @@
                 return;
             }
 
-            btn.innerHTML = 'Processing Booking...';
-            btn.style.opacity = '0.7';
+            const price = getPlanPriceFormatted();
+            const resetBtn = () => {
+                btn.innerHTML = `<i class="fa-solid fa-lock" style="margin-right:6px;"></i> Pay ₹${price} & Confirm Slot`;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            };
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px;"></i> Connecting to Razorpay...';
+            btn.style.opacity = '0.85';
             btn.style.pointerEvents = 'none';
             
             try {
-                // Real booking API call that triggers Google Integrations on backend
-                const res = await fetch('/api/book', {
+                // 1. Create Razorpay Payment Order on Backend
+                const orderRes = await fetch('/api/payment/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, dob, phone, location: loc, dateTimeStr, planId })
                 });
 
-                if (res.ok) {
-                    btn.innerHTML = 'Connecting to Payment...';
-                    setTimeout(() => {
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok || !orderData.keyId) {
+                    // Fallback: If Razorpay keys are not yet configured in admin
+                    console.warn("Razorpay key not active, falling back to direct booking registration.");
+                    const res = await fetch('/api/book', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, dob, phone, location: loc, dateTimeStr, planId })
+                    });
+                    if (res.ok) {
                         window.location.href = 'success.html';
-                    }, 800);
-                } else {
-                    throw new Error("Server returned error");
+                        return;
+                    } else {
+                        throw new Error(orderData.error || "Booking server error");
+                    }
                 }
+
+                // Ensure Razorpay SDK script is ready
+                if (typeof Razorpay === 'undefined') {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+
+                // 2. Open Official Razorpay Checkout Modal
+                const options = {
+                    key: orderData.keyId,
+                    amount: orderData.amount, // in paise
+                    currency: orderData.currency || 'INR',
+                    name: orderData.siteName || 'Trikal Darshi Tarot',
+                    description: orderData.planName || 'Tarot Session Booking',
+                    image: 'profile.jpg',
+                    order_id: orderData.orderId || undefined,
+                    prefill: {
+                        name: name,
+                        contact: phone
+                    },
+                    notes: {
+                        bookingSlot: dateTimeStr,
+                        planId: planId
+                    },
+                    theme: {
+                        color: '#8b5cf6'
+                    },
+                    handler: async function (response) {
+                        btn.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right:6px;"></i> Payment Received! Confirming...';
+                        try {
+                            const verifyRes = await fetch('/api/payment/verify-and-book', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    paymentId: response.razorpay_payment_id,
+                                    orderId: response.razorpay_order_id || orderData.orderId || '',
+                                    signature: response.razorpay_signature || '',
+                                    name, dob, phone, location: loc, dateTimeStr, planId
+                                })
+                            });
+                            const verifyData = await verifyRes.json();
+                            const bId = (verifyData && verifyData.bookingId) ? verifyData.bookingId : '';
+                            window.location.href = `success.html?bookingId=${bId}&paymentId=${response.razorpay_payment_id}`;
+                        } catch (err) {
+                            console.error("Verification error:", err);
+                            window.location.href = 'success.html';
+                        }
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            resetBtn();
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed', function (resp) {
+                    const failMsg = resp.error ? (resp.error.description || resp.error.reason) : 'Payment failed';
+                    alert("Payment Unsuccessful: " + failMsg + "\nPlease try again or choose another payment method.");
+                    resetBtn();
+                });
+                rzp.open();
+
             } catch (error) {
-                console.error("Booking failed", error);
-                alert("Something went wrong with the booking. Please try again.");
-                btn.innerHTML = 'Confirm Details';
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
+                console.error("Booking payment error:", error);
+                alert("Could not initialize payment gateway: " + error.message);
+                resetBtn();
             }
         }
 

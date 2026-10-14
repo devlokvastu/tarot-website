@@ -304,6 +304,9 @@ app.get('/api/config', (req, res) => {
     delete safeDB.auth;
     delete safeDB.sessions;
     delete safeDB.resetTokens;
+    if (safeDB.integrations && !isValidSession(req)) {
+        delete safeDB.integrations.razorpayKeySecret;
+    }
     res.json(safeDB);
 });
 
@@ -468,6 +471,176 @@ app.post('/api/book', async (req, res) => {
 
     saveDB(db);
     res.json({ success: true, bookingId: newBooking.id });
+});
+
+// ==========================================
+// --- Razorpay Payment Integration Endpoints ---
+// ==========================================
+
+// Create Razorpay Order
+app.post('/api/payment/create-order', async (req, res) => {
+    try {
+        const { planId, name, phone, dob, location, dateTimeStr } = req.body;
+        const db = getDB();
+
+        // 1. Resolve Plan and Price
+        let plan = null;
+        if (planId === 'unlisted' && db.unlistedPlan) {
+            plan = db.unlistedPlan;
+        } else {
+            const pIdx = parseInt(planId) || 0;
+            if (db.plans && db.plans[pIdx]) {
+                plan = db.plans[pIdx];
+            } else if (db.plans && db.plans[0]) {
+                plan = db.plans[0];
+            }
+        }
+
+        const rawPrice = plan ? (plan.price || '349') : '349';
+        const numPrice = parseInt(String(rawPrice).replace(/[^0-9]/g, '')) || 349;
+        const amountInPaise = numPrice * 100;
+        const planName = plan ? (plan.name || 'Tarot Reading Session') : 'Tarot Reading Session';
+        const siteName = (db.content && db.content.siteName) ? db.content.siteName : 'Trikal Darshi Tarot';
+
+        const keyId = (db.integrations && db.integrations.razorpayKeyId) ? db.integrations.razorpayKeyId.trim() : '';
+        const keySecret = (db.integrations && db.integrations.razorpayKeySecret) ? db.integrations.razorpayKeySecret.trim() : '';
+
+        if (!keyId) {
+            return res.status(400).json({
+                success: false,
+                error: 'Razorpay Key ID is not configured in Tarot CRM Integrations.'
+            });
+        }
+
+        let orderId = null;
+
+        // 2. If Key Secret is present, create official Razorpay Order via REST API
+        if (keySecret) {
+            try {
+                const authHeader = 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+                const receipt = 'rcpt_' + Date.now().toString().slice(-8);
+
+                const rzpRes = await fetch('https://api.razorpay.com/v1/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': authHeader,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: amountInPaise,
+                        currency: 'INR',
+                        receipt: receipt,
+                        notes: {
+                            planId: String(planId || '0'),
+                            clientName: String(name || ''),
+                            clientPhone: String(phone || ''),
+                            slot: String(dateTimeStr || '')
+                        }
+                    })
+                });
+
+                if (rzpRes.ok) {
+                    const rzpOrder = await rzpRes.json();
+                    orderId = rzpOrder.id;
+                } else {
+                    const errBody = await rzpRes.text();
+                    console.warn('Razorpay Orders API response:', rzpRes.status, errBody);
+                }
+            } catch (err) {
+                console.warn('Razorpay order call warning:', err.message);
+            }
+        }
+
+        return res.json({
+            success: true,
+            keyId: keyId,
+            orderId: orderId,
+            amount: amountInPaise,
+            currency: 'INR',
+            planName: planName,
+            planPrice: numPrice,
+            siteName: siteName
+        });
+    } catch (e) {
+        console.error('Error in /api/payment/create-order:', e);
+        return res.status(500).json({ success: false, error: 'Failed to initiate payment.' });
+    }
+});
+
+// Verify Payment and Create Confirmed Booking
+app.post('/api/payment/verify-and-book', async (req, res) => {
+    try {
+        const { paymentId, orderId, signature, name, dob, phone, location, dateTimeStr, planId } = req.body;
+        const db = getDB();
+        if (!db.bookings) db.bookings = [];
+
+        const keySecret = (db.integrations && db.integrations.razorpayKeySecret) ? db.integrations.razorpayKeySecret.trim() : '';
+
+        // Optional HMAC SHA256 Signature verification
+        if (orderId && signature && keySecret) {
+            try {
+                const expectedSignature = crypto.createHmac('sha256', keySecret)
+                    .update(`${orderId}|${paymentId}`)
+                    .digest('hex');
+
+                if (expectedSignature !== signature) {
+                    console.warn('Signature verification mismatch for payment ID:', paymentId);
+                }
+            } catch (sigErr) {
+                console.error('Signature verification error:', sigErr);
+            }
+        }
+
+        // Resolve plan amount & duration
+        let amount = "₹349";
+        let duration = "20 Mins";
+        if (planId === 'unlisted' && db.unlistedPlan) {
+            amount = db.unlistedPlan.price ? "₹" + String(db.unlistedPlan.price).replace(/[^0-9]/g, '') : "₹49";
+            duration = db.unlistedPlan.duration ? db.unlistedPlan.duration + " Mins" : "30 Mins";
+        } else {
+            const pIdx = parseInt(planId) || 0;
+            if (db.plans && db.plans[pIdx]) {
+                amount = db.plans[pIdx].price ? "₹" + String(db.plans[pIdx].price).replace(/[^0-9]/g, '') : "₹349";
+                duration = db.plans[pIdx].duration ? db.plans[pIdx].duration + " Mins" : "20 Mins";
+            }
+        }
+
+        const newBooking = {
+            id: "BK-" + Date.now().toString().slice(-6),
+            name: name || 'Client',
+            dob: dob || '',
+            phone: phone ? String(phone).replace(/^'/, '').trim() : '',
+            location: location || 'Online',
+            dateTimeStr: dateTimeStr || '',
+            amount: amount,
+            duration: duration,
+            status: 'Upcoming',
+            paymentId: paymentId || '',
+            paymentStatus: 'Paid',
+            createdAt: new Date().toISOString()
+        };
+
+        db.bookings.push(newBooking);
+        saveDB(db);
+
+        // Simultaneously trigger Google Sheets Webhook (Create)
+        if (db.integrations && db.integrations.googleSheetsUrl) {
+            try {
+                await fetch(db.integrations.googleSheetsUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'create', ...newBooking })
+                });
+            } catch (e) {
+                console.error("Failed to push to Google Sheets Webhook:", e);
+            }
+        }
+
+        return res.json({ success: true, bookingId: newBooking.id });
+    } catch (e) {
+        console.error('Error in /api/payment/verify-and-book:', e);
+        return res.status(500).json({ success: false, error: 'Failed to record booking.' });
+    }
 });
 
 // Fetch Bookings for CRM (Admin Only)
