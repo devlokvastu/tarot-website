@@ -227,7 +227,7 @@ header {
 
 /* Social Proof Micro-copy */
 .social-proof {
-    margin-top: 15px;
+    margin-top: 24px;
     font-size: 0.85rem;
     color: #FFB74D;
     font-weight: 500;
@@ -601,7 +601,7 @@ footer {
     }
     .social-proof {
         font-size: 0.78rem;
-        margin-top: 12px;
+        margin-top: 24px;
         padding: 5px 14px;
         max-width: 90%;
         white-space: normal;
@@ -609,7 +609,7 @@ footer {
         line-height: 1.35;
     }
     .mystical-divider {
-        margin: 12px auto 18px;
+        margin: 15px auto 20px;
     }
     .plans-section {
         padding: 24px 14px 38px;
