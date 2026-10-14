@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
     // --- 0. Admin Authentication Guard ---
     try {
-        const authRes = await fetch('/api/auth/check');
+        const authRes = await fetch https://trikaldarshi-tarot.onrender.com/api/auth/check
         const authData = await authRes.json();
         if (!authData.authenticated) {
             window.location.replace('/login.html');
@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.logoutAdmin = async function(e) {
         if (e) e.preventDefault();
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
+            await fetch('https://trikaldarshi-tarot.onrender.com/api/auth/logout', { method: 'POST' });
         } catch (err) {
             console.error("Logout error:", err);
         }
