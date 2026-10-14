@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>TrikalDarshi Tarot | Coach Sanjay</title>
-    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="style.css?v=17">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -208,6 +208,10 @@
                         `;
                         container.appendChild(cardDiv);
                     });
+                }
+                if (window.location.hash) {
+                    const target = document.querySelector(window.location.hash);
+                    if (target) setTimeout(() => window.scrollTo(0, target.offsetTop + 120), 50);
                 }
             } catch (e) {
                 console.error("Failed to fetch dynamic content from backend:", e);
