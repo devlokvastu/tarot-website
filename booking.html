@@ -193,7 +193,7 @@
         // Real Backend Integration for Slots
         async function loadSlots() {
             try {
-                const res = await fetch(`/api/slots?plan=${planId}`);
+                const res = await fetch(`https://trikaldarshi-tarot.onrender.com/api/slots?planID=${planID}`);
                 const data = await res.json();
                 
                 const dateCarousel = document.querySelector('.date-carousel');
