@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | TrikalDarshi Tarot</title>
+    <link rel="stylesheet" href="admin.css?v=26">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for standard icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-header-row">
+                    <div>
+                        <h2 id="sidebar-reader-name">Coach Sanjay</h2>
+                        <p id="sidebar-site-name">TrikalDarshi CMS</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="panel-availability"><i class="fa-regular fa-clock"></i> Availability</a>
+                <a href="#" class="nav-item" data-target="panel-blocked"><i class="fa-solid fa-calendar-xmark"></i> Block Dates</a>
+                <a href="#" class="nav-item" data-target="panel-content"><i class="fa-solid fa-pen-to-square"></i> Website Content & CMS</a>
+                <a href="#" class="nav-item" data-target="panel-plans"><i class="fa-solid fa-list"></i> Plan Editor</a>
+                <a href="#" class="nav-item" data-target="panel-crm"><i class="fa-solid fa-users"></i> CRM</a>
+                <a href="#" class="nav-item" data-target="panel-integrations"><i class="fa-solid fa-plug"></i> Integrations</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" target="_blank" class="view-site-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Live Site</a>
+                <button type="button" class="logout-btn" onclick="logoutAdmin(event)" title="Log out of Admin Portal" style="margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Persistent Floating Slide Toggle Button (stays reachable so you can slide panel in and out) -->
+        <button type="button" id="sidebar-floating-toggle" class="sidebar-floating-toggle" title="Toggle Left Panel">
+            <i class="fa-solid fa-chevron-left" id="sidebar-toggle-icon"></i>
+        </button>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- 1. Availability Manager -->
+            <section id="panel-availability" class="panel active">
+                <div class="panel-header">
+                    <h1>When are you available?</h1>
+                    <p>Choose the days and times that work for you.</p>
+                </div>
+                
+                <div class="card availability-card">
+                    <form id="form-availability">
+                        <!-- Global Session Settings -->
+                        <div class="global-settings" style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+                            <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary-color);">Global Session Settings</h3>
+                            <div style="display: flex; gap: 20px;">
+                                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                    <label>Cooling Period Buffer (mins) <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted); margin-left: 5px;">(Time reserved between appointments)</span></label>
+                                    <input type="number" id="setting-cooling" class="form-control" name="setting_cooling" value="15">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="days-list">
+                            <!-- Sunday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_sun">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Sunday</span>
+                                <div class="time-inputs disabled">
+                                    <input type="time" name="sun_start" value="09:00" class="form-control" disabled style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="sun_end" value="17:00" class="form-control" disabled style="width: auto;">
+                                </div>
+                            </div>
+                            <!-- Monday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_mon" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Monday</span>
+                                <div class="time-inputs">
+                                    <input type="time" name="mon_start" value="09:00" class="form-control" style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="mon_end" value="17:00" class="form-control" style="width: auto;">
+                                </div>
+                            </div>
+                            <!-- Tuesday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_tue" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Tuesday</span>
+                                <div class="time-inputs">
+                                    <input type="time" name="tue_start" value="09:00" class="form-control" style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="tue_end" value="17:00" class="form-control" style="width: auto;">
+                                </div>
+                            </div>
+                            <!-- Wednesday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_wed" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Wednesday</span>
+                                <div class="time-inputs">
+                                    <input type="time" name="wed_start" value="09:00" class="form-control" style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="wed_end" value="17:00" class="form-control" style="width: auto;">
+                                </div>
+                            </div>
+                            <!-- Thursday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_thu" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Thursday</span>
+                                <div class="time-inputs">
+                                    <input type="time" name="thu_start" value="09:00" class="form-control" style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="thu_end" value="17:00" class="form-control" style="width: auto;">
+                                </div>
+                            </div>
+                            <!-- Friday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_fri" checked>
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Friday</span>
+                                <div class="time-inputs">
+                                    <input type="time" name="fri_start" value="09:00" class="form-control" style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="fri_end" value="17:00" class="form-control" style="width: auto;">
+                                </div>
+                            </div>
+                            <!-- Saturday -->
+                            <div class="day-row">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="day_sat">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="day-name">Saturday</span>
+                                <div class="time-inputs disabled">
+                                    <input type="time" name="sat_start" value="09:00" class="form-control" disabled style="width: auto;">
+                                    <span>-</span>
+                                    <input type="time" name="sat_end" value="17:00" class="form-control" disabled style="width: auto;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timezone-info">
+                            <p>GMT+5 hrs 30 min Asia/Calcutta</p>
+                        </div>
+                        
+                        <div class="panel-actions">
+                            <button type="submit" class="btn-primary">Save Availability</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 1.5. Block Dates Manager with Interactive Calendar -->
+            <section id="panel-blocked" class="panel">
+                <div class="panel-header">
+                    <h1>Block Dates</h1>
+                    <p>Select date ranges on the calendar below to mark as unavailable (vacations, retreats, personal time off).</p>
+                </div>
+                
+                <div class="card" style="padding: 30px;">
+                    <!-- Calendar View -->
+                    <div class="cal-card-wrapper">
+                        <!-- Calendar Header Bar -->
+                        <div class="cal-header-bar">
+                            <div class="cal-nav">
+                                <button type="button" class="cal-nav-btn" id="cal-prev-month" title="Previous Month"><i class="fa-solid fa-chevron-left"></i></button>
+                                <h2 id="cal-month-year-title" class="cal-title">October 2026</h2>
+                                <button type="button" class="cal-nav-btn" id="cal-next-month" title="Next Month"><i class="fa-solid fa-chevron-right"></i></button>
+                                <button type="button" class="cal-today-btn" id="cal-today-btn"><i class="fa-regular fa-calendar"></i> Today</button>
+                            </div>
+                            
+                            <!-- Quick Chips -->
+                            <div class="cal-quick-chips">
+                                <button type="button" class="cal-chip" data-preset="today">Today</button>
+                                <button type="button" class="cal-chip" data-preset="tomorrow">Tomorrow</button>
+                                <button type="button" class="cal-chip" data-preset="weekend">This Weekend</button>
+                                <button type="button" class="cal-chip" data-preset="next7">Next 7 Days</button>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Legend -->
+                        <div class="cal-legend">
+                            <span class="legend-item"><span class="legend-dot dot-available"></span> Available</span>
+                            <span class="legend-item"><span class="legend-dot dot-selected"></span> Selected (In & Out)</span>
+                            <span class="legend-item"><span class="legend-dot dot-blocked"></span> Blocked</span>
+                        </div>
+
+                        <!-- Calendar Grid -->
+                        <div class="cal-weekdays">
+                            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                        </div>
+                        <div class="cal-days-grid" id="cal-days-grid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <!-- Action Bar for Selection -->
+                        <div class="cal-action-bar">
+                            <div class="cal-selection-info">
+                                <i class="fa-regular fa-calendar-check" style="color: var(--accent-color); font-size: 1.4rem;"></i>
+                                <div>
+                                    <div class="cal-sel-label" id="cal-sel-label">Click a start date (In) and end date (Out) on the calendar</div>
+                                    <div class="cal-sel-dates" id="cal-sel-dates">No dates selected</div>
+                                </div>
+                            </div>
+                            <div class="cal-action-buttons">
+                                <button type="button" class="btn-secondary" id="cal-clear-btn" style="display: none;">Clear</button>
+                                <button type="button" class="btn-primary" id="cal-block-btn" disabled style="opacity: 0.5;">
+                                    <i class="fa-solid fa-ban"></i> Block Dates
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Manual Date Range Form for Power Users / Fallback -->
+                    <details style="margin-bottom: 25px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 16px;">
+                        <summary style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">
+                            <i class="fa-solid fa-sliders"></i> Manual Date Inputs (Optional)
+                        </summary>
+                        <form id="form-blocked-dates" style="margin-top: 15px;">
+                            <div style="display:flex; gap:16px; align-items:flex-end; flex-wrap: wrap;">
+                                <div class="form-group" style="flex:1; min-width: 140px; margin-bottom:0;">
+                                    <label>Start Date</label>
+                                    <input type="date" id="block-start" class="form-control" required>
+                                </div>
+                                <div class="form-group" style="flex:1; min-width: 140px; margin-bottom:0;">
+                                    <label>End Date</label>
+                                    <input type="date" id="block-end" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn-primary" style="height: 44px; padding: 0 20px;">Block Dates</button>
+                            </div>
+                        </form>
+                    </details>
+                    
+                    <hr class="divider">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="font-size: 1.15rem; color: var(--primary-color); margin: 0;">Currently Blocked Ranges</h3>
+                        <span id="blocked-count-badge" style="font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 3px 10px; border-radius: 12px; font-weight: 600;">0 Blocked</span>
+                    </div>
+                    <div id="blocked-dates-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- JS injects blocks here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2 & 3. Profile Picture, Bio & Content Editor -->
+            <section id="panel-content" class="panel">
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <h1>Website Content & Text CMS</h1>
+                        <p>Complete control to edit all headlines, descriptions, taglines, and text across your entire website.</p>
+                    </div>
+                    <button type="button" id="top-content-save-btn" class="btn-primary" style="padding: 10px 22px; font-size: 0.95rem;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Content
+                    </button>
+                </div>
+
+                <form id="form-content">
+                    
+                    <!-- 1. Brand & Identity -->
+                    <div class="card cms-section-card">
+                        <div class="cms-section-header">
+                            <i class="fa-solid fa-id-card"></i>
+                            <div>
+                                <h3>Brand & Identity</h3>
+                                <p>Website name, reader display title, profile photo, and admin color.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="content-site-name">Website / Brand Name</label>
+                                <input type="text" id="content-site-name" class="form-control" value="TrikalDarshi Tarot" placeholder="e.g. TrikalDarshi Tarot">
+                            </div>
+                            <div class="form-group">
+                                <label for="content-reader-name">Reader Name / Title</label>
+                                <input type="text" id="content-reader-name" class="form-control" value="Coach Sanjay" placeholder="e.g. Coach Sanjay">
+                            </div>
+                        </div>
+
+                        <!-- Profile Picture Upload & Theme Color -->
+                        <div class="form-row-2" style="align-items: center; background: rgba(0,0,0,0.2); padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); margin-top: 10px;">
+                            <div class="profile-upload-area" style="display: flex; align-items: center; gap: 15px;">
+                                <div class="preview-circle">
+                                    <img id="profile-preview" src="profile.jpg" alt="Preview">
+                                </div>
+                                <div class="upload-controls">
+                                    <label for="profile-image-upload" class="btn-secondary" style="cursor: pointer; display: inline-block;">Upload Photo</label>
+                                    <input type="file" id="profile-image-upload" accept="image/png, image/jpeg" hidden>
+                                    <p class="help-text" style="font-size: 0.75rem; color: #9ca3af; margin-top: 4px;">Square photo (400x400px recommended).</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 15px;">
+                                <div style="text-align: right;">
+                                    <label style="margin: 0; font-size: 0.95rem; color: #fff;">Admin Theme Color</label>
+                                    <p style="margin: 2px 0 0; font-size: 0.75rem; color: #9ca3af;">Background tint of your CRM portal</p>
+                                </div>
+                                <input type="color" id="admin-theme-color" value="#0b0914" style="width: 48px; height: 48px; padding: 0; border: none; border-radius: 50%; cursor: pointer; background: none;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Hero Section (Home Page Top) -->
+                    <div class="card cms-section-card">
+                        <div class="cms-section-header">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <div>
+                                <h3>Hero Section (Landing Page Top)</h3>
+                                <p>The main headline, bio introduction, button text, and social proof badge.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="header-text">Main Headline</label>
+                            <input type="text" id="header-text" class="form-control" value="Clarity on Love, Career & Future." placeholder="e.g. Clarity on Love, Career & Future.">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bio-text">Public Bio / Introduction Paragraph</label>
+                            <textarea id="bio-text" class="form-control" rows="3">Namaste! I'm Coach Sanjay. Through intuitive Tarot reading and genuine counseling, I help you find clear answers, overcome confusion, and choose the right path in life.</textarea>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="content-hero-cta">Hero Button Text</label>
+                                <input type="text" id="content-hero-cta" class="form-control" value="Book Now" placeholder="e.g. Book Now">
+                            </div>
+                            <div class="form-group">
+                                <label for="content-social-proof">Social Proof / Trust Badge</label>
+                                <input type="text" id="content-social-proof" class="form-control" value="⭐ Trusted by 2,000+ followers & clients" placeholder="e.g. ⭐ Trusted by 2,000+ followers & clients">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Readings & Plans Section Copy -->
+                    <div class="card cms-section-card">
+                        <div class="cms-section-header">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <div>
+                                <h3>Readings & Plans Section Copy</h3>
+                                <p>Control the heading and tagline displayed above the pricing cards.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="content-plans-heading">Plans Section Heading</label>
+                                <input type="text" id="content-plans-heading" class="form-control" value="Choose Your Reading" placeholder="e.g. Choose Your Reading">
+                            </div>
+                            <div class="form-group">
+                                <label for="content-plans-subheading">Plans Section Subtitle / Tagline</label>
+                                <input type="text" id="content-plans-subheading" class="form-control" value="Get the clarity you need, with the right guidance for your journey." placeholder="e.g. Get the clarity you need, with the right guidance for your journey.">
+                            </div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #9ca3af; margin: 0;"><i class="fa-solid fa-circle-info"></i> Note: To edit individual tier prices, durations, and bullet features, use the <strong>Plan Editor</strong> tab in the sidebar.</p>
+                    </div>
+
+                    <!-- 4. Booking Screen Copy -->
+                    <div class="card cms-section-card">
+                        <div class="cms-section-header">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <div>
+                                <h3>Booking Screen Copy (booking.html)</h3>
+                                <p>Headlines and trust messaging shown when clients select dates and times.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="content-booking-headline">Booking Page Title</label>
+                                <input type="text" id="content-booking-headline" class="form-control" value="Schedule Your Reading" placeholder="e.g. Schedule Your Reading">
+                            </div>
+                            <div class="form-group">
+                                <label for="content-booking-subtitle">Booking Page Subtitle</label>
+                                <input type="text" id="content-booking-subtitle" class="form-control" value="Get the clarity you need, with the right guidance for your journey." placeholder="e.g. Select your preferred date & time slot...">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="content-booking-trust">Bottom Trust Banner</label>
+                            <input type="text" id="content-booking-trust" class="form-control" value="REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY" placeholder="e.g. REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY">
+                        </div>
+                    </div>
+
+                    <!-- 5. Client Testimonials & Reviews -->
+                    <div class="card cms-section-card">
+                        <div class="cms-section-header">
+                            <i class="fa-solid fa-comments"></i>
+                            <div>
+                                <h3>Client Testimonials & Reviews</h3>
+                                <p>Manage the 3 client review cards displayed on the homepage.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="content-testimonials-title">Testimonials Section Heading</label>
+                            <input type="text" id="content-testimonials-title" class="form-control" value="Client Testimonials" placeholder="e.g. Client Testimonials">
+                        </div>
+
+                        <!-- Review 1 -->
+                        <div class="review-edit-box">
+                            <span class="review-num-pill">Review 1</span>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label for="content-review1-quote">Client Quote</label>
+                                <textarea id="content-review1-quote" class="form-control" rows="2">Sir ki reading ekdum spot on thi!! Mai apne career ko leke bhot confuse tha, samaj nai aara tha kya karu. But unhone jo bataya exactly wahi ho rha hai abhi 🙏 Highly recommend</textarea>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="content-review1-author">Author / Client Name</label>
+                                <input type="text" id="content-review1-author" class="form-control" value="- Rahul M.">
+                            </div>
+                        </div>
+
+                        <!-- Review 2 -->
+                        <div class="review-edit-box" style="margin-top: 15px;">
+                            <span class="review-num-pill">Review 2</span>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label for="content-review2-quote">Client Quote</label>
+                                <textarea id="content-review2-quote" class="form-control" rows="2">Mera bhot bura time chal rha tha relationship me aur main tension me thi. Sanjay sir ne jo advice di it was so true 🥺 ab kafi peace hai life me. Thanku so much sir ❤️</textarea>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="content-review2-author">Author / Client Name</label>
+                                <input type="text" id="content-review2-author" class="form-control" value="- Neha K.">
+                            </div>
+                        </div>
+
+                        <!-- Review 3 -->
+                        <div class="review-edit-box" style="margin-top: 15px;">
+                            <span class="review-num-pill">Review 3</span>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label for="content-review3-quote">Client Quote</label>
+                                <textarea id="content-review3-quote" class="form-control" rows="2">Pehle muje in sab pe itna trust nhi tha tbh.. par just try kiya tha aise hi nd I am mind blown 🤯 Unhone past ki aisi batein batai jo kisi ko ni pta. Best tarot reader!!</textarea>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="content-review3-author">Author / Client Name</label>
+                                <input type="text" id="content-review3-author" class="form-control" value="- Priya S.">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Footer & Legal -->
+                    <div class="card cms-section-card">
+                        <div class="cms-section-header">
+                            <i class="fa-solid fa-copyright"></i>
+                            <div>
+                                <h3>Footer & Copyright</h3>
+                                <p>Footer notice at the bottom of the page.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="content-footer-copyright">Copyright Text</label>
+                            <input type="text" id="content-footer-copyright" class="form-control" value="© 2026 Coach Sanjay. All rights reserved." placeholder="e.g. © 2026 Coach Sanjay. All rights reserved.">
+                        </div>
+                    </div>
+
+                    <div class="panel-actions" style="margin-top: 25px;">
+                        <button type="submit" id="form-content-submit-btn" class="btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Content
+                        </button>
+                    </div>
+
+                </form>
+            </section>
+            
+            <!-- 4. Plan Editor -->
+            <section id="panel-plans" class="panel">
+                <div class="panel-header">
+                    <h1>Manage Reading Plans</h1>
+                    <p>Edit your pricing tiers and features.</p>
+                </div>
+
+                <form id="form-plans">
+                    <div class="plans-grid">
+                        <!-- Plan 1 -->
+                        <div class="card plan-edit-card">
+                            <h3>Plan 1 (Base)</h3>
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" name="plan_name" value="The Seeker">
+                            </div>
+                            <div class="form-group">
+                                <label>Short Description</label>
+                                <input type="text" class="form-control" name="plan_desc" value="Perfect for quick tarot clarity.">
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <div class="input-with-currency">
+                                    <span class="currency">₹</span>
+                                    <input type="number" class="form-control" name="plan_price" value="1200">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (Minutes)</label>
+                                <input type="number" class="form-control" name="plan_duration" value="30">
+                            </div>
+                            <div class="form-group">
+                                <label>Features (One per line)</label>
+                                <textarea class="form-control" name="plan_features" rows="4">1 Question • 3 Card Spread&#10;Past, Present, Future&#10;Delivered in 24 hours (PDF)</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Plan 2 -->
+                        <div class="card plan-edit-card">
+                            <h3>Plan 2 (Popular)</h3>
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" name="plan_name" value="The Lovers">
+                            </div>
+                            <div class="form-group">
+                                <label>Short Description</label>
+                                <input type="text" class="form-control" name="plan_desc" value="Deep relationship & emotional guidance.">
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <div class="input-with-currency">
+                                    <span class="currency">₹</span>
+                                    <input type="number" class="form-control" name="plan_price" value="2500">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (Minutes)</label>
+                                <input type="number" class="form-control" name="plan_duration" value="45">
+                            </div>
+                            <div class="form-group">
+                                <label>Features (One per line)</label>
+                                <textarea class="form-control" name="plan_features" rows="4">Soulmate Connection Analysis&#10;Advanced Tarot Spread&#10;Detailed Audio Recording</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Plan 3 -->
+                        <div class="card plan-edit-card">
+                            <h3>Plan 3</h3>
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" name="plan_name" value="The Mystic">
+                            </div>
+                            <div class="form-group">
+                                <label>Short Description</label>
+                                <input type="text" class="form-control" name="plan_desc" value="Comprehensive 1-on-1 tarot coaching.">
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <div class="input-with-currency">
+                                    <span class="currency">₹</span>
+                                    <input type="number" class="form-control" name="plan_price" value="4000">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (Minutes)</label>
+                                <input type="number" class="form-control" name="plan_duration" value="60">
+                            </div>
+                            <div class="form-group">
+                                <label>Features (One per line)</label>
+                                <textarea class="form-control" name="plan_features" rows="4">5 Questions • Celtic Cross&#10;Live 45-min Zoom Call&#10;Recording Included</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Plan 4 -->
+                        <div class="card plan-edit-card">
+                            <h3>Plan 4 (Premium)</h3>
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" name="plan_name" value="The Emperor">
+                            </div>
+                            <div class="form-group">
+                                <label>Short Description</label>
+                                <input type="text" class="form-control" name="plan_desc" value="Strategic tarot forecast for your year.">
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <div class="input-with-currency">
+                                    <span class="currency">₹</span>
+                                    <input type="number" class="form-control" name="plan_price" value="8000">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (Minutes)</label>
+                                <input type="number" class="form-control" name="plan_duration" value="90">
+                            </div>
+                            <div class="form-group">
+                                <label>Features (One per line)</label>
+                                <textarea class="form-control" name="plan_features" rows="4">Month-by-Month Breakdown&#10;Extensive 20+ Page PDF&#10;Priority Support</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-actions" style="margin-top: 20px;">
+                        <button type="submit" class="btn-primary">Save Pricing Plans</button>
+                    </div>
+                </form>
+
+                <!-- Divider -->
+                <div style="margin: 45px 0 30px; border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
+
+                <!-- Unlisted Plan & Standalone Landing Page Section -->
+                <div class="unlisted-plan-section">
+                    <div class="panel-header" style="margin-bottom: 22px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <h2 style="font-size: 1.45rem; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; color: #fbbf24;">
+                                    <i class="fa-solid fa-sparkles"></i> Unlisted Plan & Standalone Landing Page
+                                </h2>
+                                <p style="color: #94a3b8; font-size: 0.92rem; margin: 0;">
+                                    A private, standalone landing page with your bio section and a single exclusive plan. Includes a high-converting sticky countdown bar at the bottom.
+                                </p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <a href="offer.html" target="_blank" class="btn-secondary" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #f3f4f6; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="color: #60a5fa;"></i> View Page
+                                </a>
+                                <button type="button" class="btn-secondary" onclick="copyUnlistedLink(this)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #f3f4f6; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                    <i class="fa-regular fa-copy" style="color: #34d399;"></i> Copy Link
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="openMobilePreviewModal()" style="background: linear-gradient(135deg, rgba(225, 48, 108, 0.18), rgba(247, 119, 55, 0.18)); border: 1px solid rgba(225, 48, 108, 0.45); color: #fbcfe8; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                    <i class="fa-solid fa-mobile-screen-button" style="color: #f472b6;"></i> 📱 Mobile Preview
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unlisted Plan Card and Sticky Bar Settings -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+                        
+                        <!-- Card 1: Unlisted Plan Details -->
+                        <div class="card" style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 16px; padding: 24px;">
+                            <h3 style="color: #fbbf24; margin-bottom: 18px; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-tag"></i> Plan Offer Details
+                            </h3>
+
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" id="unlisted-plan-name" placeholder="e.g. Exclusive 1-on-1 Tarot & Life Clarity Session">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Badge Text</label>
+                                <input type="text" class="form-control" id="unlisted-plan-badge" placeholder="e.g. Special Private Offer">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Short Description</label>
+                                <input type="text" class="form-control" id="unlisted-plan-desc" placeholder="e.g. Direct priority consultation with Coach Sanjay for urgent life guidance.">
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label>Offer Price</label>
+                                    <div class="input-with-currency">
+                                        <span class="currency">₹</span>
+                                        <input type="number" class="form-control" id="unlisted-plan-price" placeholder="999">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Original / Cut Price</label>
+                                    <div class="input-with-currency">
+                                        <span class="currency">₹</span>
+                                        <input type="number" class="form-control" id="unlisted-plan-orig-price" placeholder="2999">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Duration (Minutes)</label>
+                                <input type="number" class="form-control" id="unlisted-plan-duration" placeholder="30">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Features (One per line)</label>
+                                <textarea class="form-control" id="unlisted-plan-features" rows="5" placeholder="Deep Relationship, Career & Life Analysis&#10;Immediate Guidance on Urgent Life Decisions&#10;Personalized Remedies & Guidance&#10;100% Confidential Live Video / Audio Session"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Sticky Bottom Countdown Bar Settings (As in Photo 2) -->
+                        <div class="card" style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 16px; padding: 24px;">
+                            <h3 style="color: #fbbf24; margin-bottom: 18px; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-stopwatch"></i> Fixed Bottom Bar Settings (Reference Photo)
+                            </h3>
+                            <p style="font-size: 0.85rem; color: #94a3b8; margin-top: -10px; margin-bottom: 16px;">
+                                Controls the sticky bottom banner that stays pinned to the bottom during scrolling.
+                            </p>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div class="form-group">
+                                    <label>Countdown Duration (Minutes)</label>
+                                    <input type="number" class="form-control" id="unlisted-timer-minutes" value="2" min="1" max="60" placeholder="2">
+                                </div>
+                                <div class="form-group">
+                                    <label>Timer Top Badge</label>
+                                    <input type="text" class="form-control" id="unlisted-timer-badge" value="Limited Time Offer" placeholder="Limited Time Offer">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sticky Bar Bullet 1</label>
+                                <input type="text" class="form-control" id="unlisted-bullet-1" placeholder="1-on-1 Personalized Reading">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sticky Bar Bullet 2</label>
+                                <input type="text" class="form-control" id="unlisted-bullet-2" placeholder="Confidential & Live Consultation">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sticky Bar Bullet 3</label>
+                                <input type="text" class="form-control" id="unlisted-bullet-3" placeholder="Limited Slots Available Today">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Sticky Bar CTA Button Text</label>
+                                <input type="text" class="form-control" id="unlisted-cta-text" placeholder="ENROLL NOW">
+                            </div>
+
+                            <div style="margin-top: 15px; padding: 12px; background: rgba(245, 158, 11, 0.08); border-radius: 8px; border: 1px dashed rgba(245, 158, 11, 0.25);">
+                                <span style="font-size: 0.82rem; color: #fbbf24; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-solid fa-circle-info"></i> Includes a 2-minute real-time countdown timer, high-contrast glow button, and theme gradients matching your reference.
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+                        <button type="button" class="btn-primary" id="btn-save-unlisted" onclick="saveUnlistedPlan(this)">
+                            <i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i>
+                            Save Unlisted Plan & Settings
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. CRM (Kanban Board) -->
+            <section id="panel-crm" class="panel">
+                <div class="crm-header-bar">
+                    <h1><i class="fa-solid fa-moon"></i> Tarot CRM</h1>
+                    <div class="crm-actions">
+                        <button type="button" class="btn-secondary btn-sort-time active-asc" id="btn-sort-time" onclick="toggleSortTime()" title="Sorted: Earliest First (Click to sort Latest First)">
+                            <i class="fa-solid fa-arrow-down-up-across-line"></i> <span id="sort-time-label">Time &uarr;</span>
+                        </button>
+                        <input type="text" class="crm-search" placeholder="Search by name...">
+                        <input type="file" id="csv-file-input" accept=".csv,text/csv,text/plain" style="display: none;" onchange="handleCSVUpload(this)">
+                        <button type="button" class="btn-upload" id="btn-upload-csv" onclick="triggerCSVUpload()"><i class="fa-solid fa-upload"></i> Upload CSV</button>
+                        <button type="button" class="btn-sync-wheel" id="btn-sync-wheel" onclick="syncGoogleSheets(this)" title="Sync with Google Sheets">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                    </div>
+                </div>
+
+                                <div class="kanban-board">
+                    <!-- Column 1: Upcoming Sessions -->
+                    <div class="kanban-column" data-status="upcoming">
+                        <h3>Upcoming Sessions</h3>
+                        <p class="column-count">0 sessions</p>
+                        <div class="kanban-column-content" id="col-Upcoming" data-status="Upcoming" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Done -->
+                    <div class="kanban-column" data-status="done">
+                        <h3>Done</h3>
+                        <p class="column-count">0 sessions</p>
+                        <div class="kanban-column-content" id="col-Completed" data-status="Completed" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        </div>
+                    </div>
+
+                    <!-- Column 3: Cancelled -->
+                    <div class="kanban-column" data-status="cancelled">
+                        <h3>Cancelled</h3>
+                        <p class="column-count">0 sessions</p>
+                        <div class="kanban-column-content" id="col-Cancelled" data-status="Cancelled" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        </div>
+                    </div>
+
+                    <!-- Column 4: Rescheduled -->
+                    <div class="kanban-column" data-status="rescheduled">
+                        <h3>Rescheduled</h3>
+                        <p class="column-count">0 sessions</p>
+                        <div class="kanban-column-content" id="col-Rescheduled" data-status="Rescheduled" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Integrations -->
+            <section id="panel-integrations" class="panel">
+                <div class="panel-header">
+                    <h1>Integrations</h1>
+                    <p>Connect third-party services to automate your bookings.</p>
+                </div>
+
+                <!-- Google Sheets Webhook Card -->
+                <div class="card integration-card" style="margin-bottom: 20px;">
+                    <div class="integration-content" style="max-width: 100%;">
+                        <h2>Google Sheets Sync (No Login Required)</h2>
+                        <p>Automatically push new bookings into your Google Sheet by connecting a Google Apps Script Web App URL.</p>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Google Apps Script URL (Webhook)</label>
+                            <input type="text" id="google-webhook-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+                            <button type="button" class="btn-primary" onclick="saveWebhookUrl(this)">
+                                <i class="fa-solid fa-table" style="margin-right: 8px;"></i>
+                                Save Sheets Link
+                            </button>
+                            <button type="button" class="btn-secondary" id="btn-open-appscript" onclick="openAppScriptModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #f3f4f6; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;">
+                                <i class="fa-solid fa-code" style="color: #60a5fa;"></i>
+                                App Script Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Razorpay API Card -->
+                <div class="card integration-card" style="position: relative;">
+                    <div class="integration-content" style="max-width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+                            <div>
+                                <h2>Payment Gateway (Razorpay API)</h2>
+                                <p>Integrate Razorpay to process fees securely. Configure your API keys below.</p>
+                            </div>
+                            <span id="rzp-status-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                <i class="fa-solid fa-circle-xmark"></i> Not Configured
+                            </span>
+                        </div>
+                        
+                        <form autocomplete="off" onsubmit="event.preventDefault();" style="margin-top: 20px;">
+                            <!-- Fake hidden fields to intercept aggressive browser credential autofill -->
+                            <input type="text" name="prevent_autofill_user" style="display:none !important;" tabindex="-1" autocomplete="new-password">
+                            <input type="password" name="prevent_autofill_pwd" style="display:none !important;" tabindex="-1" autocomplete="new-password">
+
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label for="razorpay-key-id" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; color: #cbd5e1;">Razorpay Key ID</label>
+                                <input type="text" id="razorpay-key-id" name="rzp_public_key_field" class="form-control" placeholder="e.g. rzp_live_xxxxxxxx or rzp_test_xxxxxxxx" autocomplete="off" data-lpignore="true" data-1p-ignore="true" spellcheck="false">
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label for="razorpay-key-secret" style="display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; color: #cbd5e1;">Razorpay Key Secret</label>
+                                <div style="position: relative; display: flex; align-items: center;">
+                                    <input type="password" id="razorpay-key-secret" name="rzp_secret_key_field" class="form-control" placeholder="Enter your Razorpay Key Secret" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" spellcheck="false" style="padding-right: 44px;">
+                                    <button type="button" onclick="toggleRzpSecret(this)" title="Show / Hide Secret Key" style="position: absolute; right: 12px; background: none; border: none; color: #94a3b8; cursor: pointer; padding: 6px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <button type="button" class="btn-primary" id="btn-save-razorpay" onclick="saveRazorpayKeys(this)">
+                                    <i class="fa-solid fa-floppy-disk" style="margin-right: 8px;"></i>
+                                    Save Razorpay Keys
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="clearRazorpayKeys()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.18); color: #cbd5e1; padding: 12px 18px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    Clear Keys
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="footer-note">
+                    <p>Don't worry, You can customize all of this later in the settings page.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function saveWebhookUrl(btn) {
+            const url = document.getElementById('google-webhook-url').value;
+            if(!url.includes('script.google.com')) {
+                alert("Please enter a valid Google Apps Script Web App URL.");
+                return;
+            }
+            
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving...';
+            
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    integrations: { googleSheetsUrl: url }
+                })
+            }).then(() => {
+                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Saved!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = oldText;
+                    btn.style.background = '#0f9d58';
+                }, 2000);
+            });
+        }
+
+        function simulateConnect(btn, type) {
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Connecting...';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connected to ' + type;
+                btn.style.background = '#10b981';
+                btn.style.borderColor = '#059669';
+                btn.style.color = '#fff';
+            }, 1200);
+        }
+        function toggleRzpSecret(btn) {
+            const input = document.getElementById('razorpay-key-secret');
+            if (!input) return;
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            } else {
+                input.type = 'password';
+                if (icon) {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        }
+
+        async function saveRazorpayKeys(btn) {
+            const keyIdInput = document.getElementById('razorpay-key-id');
+            const keySecretInput = document.getElementById('razorpay-key-secret');
+            const keyId = keyIdInput ? keyIdInput.value.trim() : '';
+            const keySecret = keySecretInput ? keySecretInput.value.trim() : '';
+
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px;"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        integrations: {
+                            razorpayKeyId: keyId,
+                            razorpayKeySecret: keySecret
+                        }
+                    })
+                });
+
+                if (res.ok) {
+                    window._savedRzpKeyId = keyId;
+                    window._savedRzpKeySecret = keySecret;
+                    btn.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> Saved Successfully!';
+                    btn.style.background = '#10b981';
+                    updateRzpBadge(keyId, keySecret);
+                    setTimeout(() => {
+                        btn.innerHTML = oldText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2200);
+                } else {
+                    throw new Error('Server returned an error');
+                }
+            } catch (err) {
+                console.error('Error saving Razorpay keys:', err);
+                alert('Could not save Razorpay keys. Please check connection and try again.');
+                btn.innerHTML = oldText;
+                btn.disabled = false;
+            }
+        }
+
+        async function clearRazorpayKeys() {
+            if (!confirm('Are you sure you want to clear your saved Razorpay API keys?')) return;
+            const keyIdInput = document.getElementById('razorpay-key-id');
+            const keySecretInput = document.getElementById('razorpay-key-secret');
+            if (keyIdInput) keyIdInput.value = '';
+            if (keySecretInput) keySecretInput.value = '';
+
+            window._savedRzpKeyId = '';
+            window._savedRzpKeySecret = '';
+
+            try {
+                await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        integrations: {
+                            razorpayKeyId: '',
+                            razorpayKeySecret: ''
+                        }
+                    })
+                });
+                updateRzpBadge('', '');
+            } catch (e) {
+                console.error('Failed to clear keys on server:', e);
+            }
+        }
+
+        function updateRzpBadge(keyId, keySecret) {
+            const badge = document.getElementById('rzp-status-badge');
+            if (!badge) return;
+            const hasId = keyId && String(keyId).trim() !== '' && String(keyId).trim() !== 'admin';
+            const hasSecret = keySecret && String(keySecret).trim() !== '';
+
+            if (hasId && hasSecret) {
+                badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Connected';
+                badge.style.background = 'rgba(16, 185, 129, 0.15)';
+                badge.style.color = '#34d399';
+                badge.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+            } else if (hasId || hasSecret) {
+                badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Incomplete';
+                badge.style.background = 'rgba(245, 158, 11, 0.15)';
+                badge.style.color = '#fbbf24';
+                badge.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+            } else {
+                badge.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Not Configured';
+                badge.style.background = 'rgba(239, 68, 68, 0.15)';
+                badge.style.color = '#f87171';
+                badge.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            }
+        }
+
+        function copyUnlistedLink(btn) {
+            const url = window.location.origin + '/offer.html';
+            navigator.clipboard.writeText(url).then(() => {
+                const oldText = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check" style="color: #34d399;"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = oldText; }, 2000);
+            }).catch(() => {
+                prompt("Copy this link to your unlisted landing page:", url);
+            });
+        }
+
+        let _currentMobileInfo = null;
+        let _currentMobileTab = 'offer';
+
+        async function openMobilePreviewModal() {
+            const overlay = document.getElementById('mobile-preview-modal-overlay');
+            if (!overlay) return;
+            overlay.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/network-info');
+                _currentMobileInfo = await res.json();
+                renderMobilePreview();
+            } catch(e) {
+                console.error("Failed to fetch network info", e);
+                const localIp = window.location.hostname || '192.168.0.157';
+                _currentMobileInfo = {
+                    offerUrl: `http://${localIp}:3000/offer.html`,
+                    homeUrl: `http://${localIp}:3000/`
+                };
+                renderMobilePreview();
+            }
+        }
+
+        function switchMobilePreviewTab(tab) {
+            _currentMobileTab = tab;
+            const btnOffer = document.getElementById('tab-mob-offer');
+            const btnHome = document.getElementById('tab-mob-home');
+            if (tab === 'offer') {
+                btnOffer.style.background = '#e1306c';
+                btnOffer.style.borderColor = '#e1306c';
+                btnOffer.style.color = '#ffffff';
+                btnHome.style.background = 'rgba(255,255,255,0.06)';
+                btnHome.style.borderColor = 'rgba(255,255,255,0.15)';
+                btnHome.style.color = '#cbd5e1';
+            } else {
+                btnHome.style.background = '#e1306c';
+                btnHome.style.borderColor = '#e1306c';
+                btnHome.style.color = '#ffffff';
+                btnOffer.style.background = 'rgba(255,255,255,0.06)';
+                btnOffer.style.borderColor = 'rgba(255,255,255,0.15)';
+                btnOffer.style.color = '#cbd5e1';
+            }
+            renderMobilePreview();
+        }
+
+        function renderMobilePreview() {
+            if (!_currentMobileInfo) return;
+            const targetUrl = _currentMobileTab === 'offer' ? _currentMobileInfo.offerUrl : _currentMobileInfo.homeUrl;
+            const urlText = document.getElementById('mobile-url-text');
+            if (urlText) urlText.innerText = targetUrl;
+            const qrImg = document.getElementById('mobile-qr-img');
+            if (qrImg) {
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(targetUrl)}`;
+            }
+        }
+
+        function copyMobileUrl(btn) {
+            const url = document.getElementById('mobile-url-text').innerText.trim();
+            navigator.clipboard.writeText(url).then(() => {
+                const oldHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.innerHTML = oldHtml;
+                    btn.style.background = '';
+                }, 2000);
+            });
+        }
+
+        function closeMobilePreviewModal(e) {
+            if (e && e.target !== e.currentTarget && !e.target.classList.contains('bm-close') && !e.target.closest('.bm-close')) return;
+            const overlay = document.getElementById('mobile-preview-modal-overlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
+
+        async function saveUnlistedPlan(btn) {
+            const payload = {
+                unlistedPlan: {
+                    active: true,
+                    name: document.getElementById('unlisted-plan-name')?.value || "Exclusive 1-on-1 Tarot & Life Clarity Session",
+                    badge: document.getElementById('unlisted-plan-badge')?.value || "Special Private Offer",
+                    desc: document.getElementById('unlisted-plan-desc')?.value || "",
+                    price: document.getElementById('unlisted-plan-price')?.value || "999",
+                    originalPrice: document.getElementById('unlisted-plan-orig-price')?.value || "2999",
+                    duration: document.getElementById('unlisted-plan-duration')?.value || "30",
+                    features: (document.getElementById('unlisted-plan-features')?.value || "")
+                                .split('\n').map(f => f.trim()).filter(f => f),
+                    timerMinutes: parseInt(document.getElementById('unlisted-timer-minutes')?.value) || 2,
+                    timerBadge: document.getElementById('unlisted-timer-badge')?.value || "Limited Time Offer",
+                    bullet1: document.getElementById('unlisted-bullet-1')?.value || "1-on-1 Personalized Reading",
+                    bullet2: document.getElementById('unlisted-bullet-2')?.value || "Confidential & Live Consultation",
+                    bullet3: document.getElementById('unlisted-bullet-3')?.value || "Limited Slots Available Today",
+                    ctaText: document.getElementById('unlisted-cta-text')?.value || "ENROLL NOW"
+                }
+            };
+
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px;"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    btn.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> Saved Successfully!';
+                    btn.style.background = '#10b981';
+                    setTimeout(() => {
+                        btn.innerHTML = oldText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2200);
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (err) {
+                console.error('Error saving unlisted plan:', err);
+                alert('Could not save unlisted plan. Please try again.');
+                btn.innerHTML = oldText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+    <script src="admin.js?v=27"></script>
+
+    <!-- Dedicated Scoped Modal Styling (Restored Spacious & Roomy Design) -->
+    <style id="bm-custom-modal-styles">
+        /* Prevent browser autofill style override (removes unwanted light-blue/white background) */
+        .integration-card input:-webkit-autofill,
+        .integration-card input:-webkit-autofill:hover, 
+        .integration-card input:-webkit-autofill:focus,
+        .integration-card input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #22050d inset !important;
+            -webkit-text-fill-color: #f3f4f6 !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        #booking-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        #booking-modal-overlay.hidden { display: none !important; }
+        
+        /* Modal Card - Spacious 580px width utilizing desktop screen space comfortably */
+        #booking-modal-overlay .bm-card {
+            position: relative;
+            width: 580px; max-width: 95vw; max-height: 92vh;
+            overflow-y: auto;
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 0 30px 28px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        #booking-modal-overlay .bm-accent-bar {
+            height: 4px;
+            border-radius: 0 0 4px 4px;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #f59e0b);
+            margin: 0 -30px 20px;
+            width: calc(100% + 60px);
+        }
+
+        /* Top Controls */
+        #booking-modal-overlay .bm-top-controls {
+            position: absolute; top: 16px; right: 20px;
+            display: flex; align-items: center; gap: 10px;
+            z-index: 10;
+        }
+        #booking-modal-overlay .bm-icon-btn {
+            width: 36px; height: 36px; border-radius: 10px;
+            border: none; cursor: pointer;
+            background: rgba(255, 255, 255, 0.06); color: #9ca3af;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; transition: all 0.2s;
+        }
+        #booking-modal-overlay .bm-header-delete {
+            background: rgba(239, 68, 68, 0.12); color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+        #booking-modal-overlay .bm-header-delete:hover {
+            background: #ef4444; color: #fff; transform: scale(1.08);
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.45);
+        }
+        #booking-modal-overlay .bm-close:hover {
+            background: rgba(255, 255, 255, 0.15); color: #fff; transform: rotate(90deg);
+        }
+
+        /* Profile Row */
+        #booking-modal-overlay .bm-profile {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 20px;
+        }
+        #booking-modal-overlay .bm-avatar {
+            width: 52px; height: 52px; border-radius: 15px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.45rem; font-weight: 700; color: #fff; flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+        }
+        #booking-modal-overlay .bm-name {
+            margin: 0; font-size: 1.4rem; font-weight: 700; color: #f9fafb;
+        }
+        #booking-modal-overlay .bm-booking-id {
+            font-size: 0.78rem; color: #6b7280; font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* Spacious Timer Section */
+        #booking-modal-overlay .bm-timer-section {
+            display: flex; align-items: center; justify-content: space-around;
+            gap: 24px; margin-bottom: 22px;
+            padding: 22px 28px;
+            background: rgba(0, 0, 0, 0.38);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        #booking-modal-overlay .bm-timer-ring {
+            position: relative; width: 114px; height: 114px; flex-shrink: 0;
+        }
+        #booking-modal-overlay .bm-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        #booking-modal-overlay .bm-ring-bg { fill: none; stroke: rgba(255, 255, 255, 0.06); stroke-width: 6; }
+        #booking-modal-overlay .bm-ring-progress {
+            fill: none; stroke: url(#timer-gradient); stroke-width: 6;
+            stroke-linecap: round; stroke-dasharray: 339.292; stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+        }
+        #booking-modal-overlay .bm-timer-digits {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        #booking-modal-overlay .bm-timer-digits span:first-child {
+            font-size: 1.7rem; font-weight: 800; color: #fff; font-family: monospace;
+            letter-spacing: 1px;
+        }
+        #booking-modal-overlay .bm-timer-label {
+            font-size: 0.68rem !important; color: #6b7280 !important; text-transform: uppercase;
+            letter-spacing: 1.4px; font-weight: 700 !important;
+        }
+        #booking-modal-overlay .bm-timer-btns {
+            display: flex; flex-direction: column; gap: 10px; align-items: center;
+        }
+        #booking-modal-overlay .bm-timer-btns-row {
+            display: flex; gap: 10px;
+        }
+        #booking-modal-overlay .bm-tbtn {
+            width: 44px; height: 44px; border-radius: 12px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #booking-modal-overlay .bm-tbtn-start {
+            background: #10b981; color: white;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+        }
+        #booking-modal-overlay .bm-tbtn-start:hover { background: #059669; transform: scale(1.08); }
+        #booking-modal-overlay .bm-tbtn-start.paused {
+            background: #f59e0b;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+        }
+        #booking-modal-overlay .bm-tbtn-reset { background: rgba(255, 255, 255, 0.08); color: #9ca3af; }
+        #booking-modal-overlay .bm-tbtn-reset:hover { background: rgba(255, 255, 255, 0.16); color: #fff; transform: scale(1.08); }
+
+        /* +5 Min Extension Button */
+        #booking-modal-overlay .bm-tbtn-add5 {
+            height: 34px; width: 100%;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.35);
+            background: rgba(139, 92, 246, 0.16);
+            color: #c4b5fd;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            outline: none;
+            white-space: nowrap;
+        }
+        #booking-modal-overlay .bm-tbtn-add5:hover {
+            background: #8b5cf6;
+            border-color: #a855f7;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.45);
+            transform: scale(1.05);
+        }
+
+        /* Red Buzzer Alarm State */
+        @keyframes redBuzzerPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7), inset 0 0 16px rgba(239, 68, 68, 0.3);
+                border-color: rgba(239, 68, 68, 0.85);
+                background: rgba(239, 68, 68, 0.12);
+            }
+            50% {
+                box-shadow: 0 0 32px 8px rgba(239, 68, 68, 0.85), inset 0 0 28px rgba(239, 68, 68, 0.55);
+                border-color: #ff3b30;
+                background: rgba(239, 68, 68, 0.22);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7), inset 0 0 16px rgba(239, 68, 68, 0.3);
+                border-color: rgba(239, 68, 68, 0.85);
+                background: rgba(239, 68, 68, 0.12);
+            }
+        }
+        @keyframes textBuzzerFlash {
+            0%, 100% { color: #ff4d4d; text-shadow: 0 0 14px rgba(239, 68, 68, 0.9); }
+            50% { color: #ffffff; text-shadow: 0 0 22px rgba(255, 255, 255, 0.95); }
+        }
+        @keyframes buzzerRingFlash {
+            0%, 100% { stroke: #ef4444 !important; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9)); }
+            50% { stroke: #ff7875 !important; filter: drop-shadow(0 0 18px rgba(239, 68, 68, 1)); }
+        }
+        @keyframes add5Beacon {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.6); }
+            50% { transform: scale(1.06); box-shadow: 0 0 18px 4px rgba(168, 85, 247, 0.85); border-color: #c084fc !important; }
+        }
+
+        #booking-modal-overlay .bm-timer-section.bm-buzzer-active {
+            animation: redBuzzerPulse 1.1s infinite ease-in-out !important;
+            border-color: #ef4444 !important;
+        }
+        #booking-modal-overlay .bm-timer-section.bm-buzzer-active .bm-ring-progress {
+            animation: buzzerRingFlash 1.1s infinite ease-in-out !important;
+        }
+        #booking-modal-overlay .bm-timer-section.bm-buzzer-active .bm-timer-digits span:first-child {
+            animation: textBuzzerFlash 1.1s infinite ease-in-out !important;
+        }
+        #booking-modal-overlay .bm-timer-section.bm-buzzer-active .bm-timer-label {
+            color: #ef4444 !important; font-weight: 800 !important; letter-spacing: 1.2px !important;
+            animation: textBuzzerFlash 1.1s infinite ease-in-out !important;
+        }
+        #booking-modal-overlay .bm-timer-section.bm-buzzer-active .bm-tbtn-add5 {
+            animation: add5Beacon 1.1s infinite ease-in-out !important;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899) !important;
+            color: #ffffff !important; border-color: #c084fc !important;
+        }
+        #booking-modal-overlay .bm-tbtn.buzzer-alert {
+            background: #ef4444 !important; color: #ffffff !important;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.7) !important;
+        }
+
+        /* Unified 6-Item Info Grid - Matching Exact Previous Reference */
+        #booking-modal-overlay .bm-info-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+        #booking-modal-overlay .bm-info-item {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: transparent;
+        }
+        #booking-modal-overlay .bm-info-item:nth-child(2n) {
+            border-right: none;
+        }
+        #booking-modal-overlay .bm-info-item:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+        #booking-modal-overlay .bm-info-item > i {
+            color: #6b7280; font-size: 0.95rem; margin-top: 3px;
+            width: 18px; text-align: center; flex-shrink: 0;
+        }
+        #booking-modal-overlay .bm-info-label {
+            display: block; font-size: 0.68rem; color: #6b7280;
+            text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 3px;
+        }
+        #booking-modal-overlay .bm-info-value {
+            display: block; font-size: 0.95rem; color: #e5e7eb; font-weight: 600;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        #booking-modal-overlay .bm-link { color: #60a5fa; text-decoration: none; }
+        #booking-modal-overlay .bm-link:hover { text-decoration: underline; }
+
+        /* Actions Container - Full Width 4 Status Pills */
+        #booking-modal-overlay .bm-actions-container {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+        }
+        #booking-modal-overlay .bm-status-pill {
+            flex: 1; height: 44px; padding: 0 12px;
+            border-radius: 12px; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            white-space: nowrap; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            outline: none;
+        }
+        #booking-modal-overlay .bm-pill-upcoming    { flex: 1.1; }
+        #booking-modal-overlay .bm-pill-completed   { flex: 0.9; }
+        #booking-modal-overlay .bm-pill-rescheduled { flex: 1.25; }
+        #booking-modal-overlay .bm-pill-cancelled   { flex: 0.95; }
+
+        /* Distinct Color Coding - Inactive / Default */
+        #booking-modal-overlay .bm-pill-upcoming {
+            background: rgba(59, 130, 246, 0.12) !important;
+            border: 1px solid rgba(59, 130, 246, 0.35) !important;
+            color: #93c5fd !important;
+        }
+        #booking-modal-overlay .bm-pill-upcoming i { color: #60a5fa !important; }
+        #booking-modal-overlay .bm-pill-upcoming:hover {
+            background: rgba(59, 130, 246, 0.22) !important;
+            border-color: #3b82f6 !important;
+        }
+
+        #booking-modal-overlay .bm-pill-completed {
+            background: rgba(16, 185, 129, 0.12) !important;
+            border: 1px solid rgba(16, 185, 129, 0.35) !important;
+            color: #6ee7b7 !important;
+        }
+        #booking-modal-overlay .bm-pill-completed i { color: #10b981 !important; }
+        #booking-modal-overlay .bm-pill-completed:hover {
+            background: rgba(16, 185, 129, 0.22) !important;
+            border-color: #10b981 !important;
+        }
+
+        #booking-modal-overlay .bm-pill-rescheduled {
+            background: rgba(245, 158, 11, 0.12) !important;
+            border: 1px solid rgba(245, 158, 11, 0.35) !important;
+            color: #fcd34d !important;
+        }
+        #booking-modal-overlay .bm-pill-rescheduled i { color: #f59e0b !important; }
+        #booking-modal-overlay .bm-pill-rescheduled:hover {
+            background: rgba(245, 158, 11, 0.22) !important;
+            border-color: #f59e0b !important;
+        }
+
+        #booking-modal-overlay .bm-pill-cancelled {
+            background: rgba(239, 68, 68, 0.12) !important;
+            border: 1px solid rgba(239, 68, 68, 0.35) !important;
+            color: #fca5a5 !important;
+        }
+        #booking-modal-overlay .bm-pill-cancelled i { color: #ef4444 !important; }
+        #booking-modal-overlay .bm-pill-cancelled:hover {
+            background: rgba(239, 68, 68, 0.22) !important;
+            border-color: #ef4444 !important;
+        }
+
+        /* Active States */
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-upcoming {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+            border-color: #60a5fa !important; color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
+        }
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-upcoming i { color: #ffffff !important; }
+
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-completed {
+            background: linear-gradient(135deg, #059669, #047857) !important;
+            border-color: #34d399 !important; color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.45) !important;
+        }
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-completed i { color: #ffffff !important; }
+
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-rescheduled {
+            background: linear-gradient(135deg, #d97706, #b45309) !important;
+            border-color: #fbbf24 !important; color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45) !important;
+        }
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-rescheduled i { color: #ffffff !important; }
+
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-cancelled {
+            background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+            border-color: #f87171 !important; color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45) !important;
+        }
+        #booking-modal-overlay .bm-status-pill.active.bm-pill-cancelled i { color: #ffffff !important; }
+
+        /* Button Pop */
+        @keyframes pillPop {
+            0% { transform: scale(1); }
+            35% { transform: scale(0.92); }
+            70% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+        .bm-pill-pop { animation: pillPop 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+
+        /* Instant Kanban Shifting Animation */
+        .kanban-card {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .kanban-card.card-shifting-out {
+            transform: scale(0.92) translateY(-12px) !important;
+            opacity: 0.2 !important; filter: blur(1px); pointer-events: none;
+        }
+        @keyframes cardShiftIn {
+            0% { opacity: 0; transform: translateY(-28px) scale(0.92); }
+            60% { opacity: 1; transform: translateY(6px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .kanban-card.card-shifted-in {
+            animation: cardShiftIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+            z-index: 10;
+        }
+        .kanban-card.card-shifted-in[data-glow-status="Upcoming"] {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6), 0 8px 24px -4px rgba(59, 130, 246, 0.45) !important;
+        }
+        .kanban-card.card-shifted-in[data-glow-status="Completed"],
+        .kanban-card.card-shifted-in[data-glow-status="Done"] {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.6), 0 8px 24px -4px rgba(16, 185, 129, 0.45) !important;
+        }
+        .kanban-card.card-shifted-in[data-glow-status="Rescheduled"] {
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.6), 0 8px 24px -4px rgba(245, 158, 11, 0.45) !important;
+        }
+        .kanban-card.card-shifted-in[data-glow-status="Cancelled"] {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.6), 0 8px 24px -4px rgba(239, 68, 68, 0.45) !important;
+        }
+
+        /* --- Google Apps Script Modal Styles --- */
+        #appscript-modal-overlay .appscript-card {
+            position: relative;
+            width: 720px;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0 28px 24px;
+            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .appscript-steps-box {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .appscript-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #d1d5db;
+            line-height: 1.45;
+        }
+
+        .appscript-step strong {
+            color: #60a5fa;
+        }
+
+        .appscript-step em {
+            color: #fcd34d;
+            font-style: normal;
+        }
+
+        .appscript-step-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .appscript-code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1f2937;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            padding: 10px 16px;
+        }
+
+        .appscript-code-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #e5e7eb;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .btn-copy-code {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #e5e7eb;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-copy-code:hover {
+            background: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-copy-code.copied {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+
+        /* Lock & Edit Control Buttons in Modal Header */
+        .btn-code-control {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #d1d5db;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .btn-code-lock.is-locked {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.35);
+            color: #f87171;
+        }
+        .btn-code-lock.is-locked:hover {
+            background: rgba(239, 68, 68, 0.22);
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-code-lock.is-unlocked {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            color: #fbbf24;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+        .btn-code-lock.is-unlocked:hover {
+            background: rgba(245, 158, 11, 0.32);
+            color: #ffffff;
+        }
+
+        .btn-code-edit.locked {
+            opacity: 0.45;
+            cursor: not-allowed;
+            color: #9ca3af;
+        }
+
+        .btn-code-edit.unlocked {
+            opacity: 1;
+            cursor: pointer;
+            background: rgba(59, 130, 246, 0.16);
+            border-color: rgba(59, 130, 246, 0.45);
+            color: #60a5fa;
+        }
+        .btn-code-edit.unlocked:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .btn-code-edit.editing {
+            background: #2563eb;
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+        }
+
+        .shake-btn {
+            animation: shakeHoriz 0.4s ease;
+        }
+        @keyframes shakeHoriz {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .appscript-code-textarea {
+            width: 100%;
+            height: 320px;
+            margin: 0;
+            padding: 16px;
+            font-family: 'JetBrains Mono', Consolas, 'Fira Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.55;
+            color: #f3f4f6;
+            background: #0b0f19;
+            border: none;
+            outline: none;
+            resize: none;
+            display: none;
+            box-sizing: border-box;
+            tab-size: 2;
+        }
+
+        .appscript-code-textarea:focus {
+            box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Prominent Save Button Floating Inside the Code Box */
+        .btn-appscript-save-inside {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            z-index: 25;
+            display: none;
+            align-items: center;
+            gap: 7px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.5), 0 0 0 1px rgba(0,0,0,0.3);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeInSaveBtn 0.25s ease-out;
+        }
+
+        @keyframes fadeInSaveBtn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-appscript-save-inside:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(16, 185, 129, 0.7);
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .appscript-code-wrapper {
+            background: #0b0f19;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0 0 12px 12px;
+            max-height: 320px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .appscript-code-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .appscript-code-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .appscript-code-pre {
+            margin: 0;
+            padding: 16px;
+            font-family: 'JetBrains Mono', Consolas, 'Fira Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.55;
+            color: #e2e8f0;
+            white-space: pre;
+            tab-size: 2;
+        }
+    </style>
+
+    <!-- CRM Booking Modal (Restored Spacious & Premium Design) -->
+    <div id="booking-modal-overlay" class="bm-overlay hidden" onclick="closeBookingModal(event)">
+        <div class="bm-card" onclick="event.stopPropagation()">
+
+            <!-- Top Accent Bar -->
+            <div class="bm-accent-bar"></div>
+
+            <!-- Top Controls (Dustbin & Close) -->
+            <div class="bm-top-controls">
+                <button type="button" class="bm-icon-btn bm-header-delete" onclick="deleteCurrentBooking()" title="Delete Appointment">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <button type="button" class="bm-icon-btn bm-close" onclick="closeBookingModal()" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Profile Row -->
+            <div class="bm-profile">
+                <div class="bm-avatar" id="modal-avatar">T</div>
+                <div>
+                    <h2 class="bm-name" id="modal-name">Client</h2>
+                    <span class="bm-booking-id" id="modal-id">BK-000000</span>
+                </div>
+            </div>
+
+            <!-- Countdown Timer (Spacious & Prominent Card) -->
+            <div class="bm-timer-section" id="bm-timer-section">
+                <div class="bm-timer-ring">
+                    <svg viewBox="0 0 120 120" class="bm-ring-svg">
+                        <circle cx="60" cy="60" r="54" class="bm-ring-bg"/>
+                        <circle cx="60" cy="60" r="54" class="bm-ring-progress" id="timer-ring-progress"/>
+                    </svg>
+                    <div class="bm-timer-digits">
+                        <span id="timer-display">20:00</span>
+                        <span class="bm-timer-label" id="timer-label">remaining</span>
+                    </div>
+                </div>
+                <div class="bm-timer-btns">
+                    <div class="bm-timer-btns-row">
+                        <button type="button" class="bm-tbtn bm-tbtn-start" id="btn-timer-toggle" onclick="toggleSessionTimer()" title="Start / Pause Timer"><i class="fa-solid fa-play"></i></button>
+                        <button type="button" class="bm-tbtn bm-tbtn-reset" onclick="resetSessionTimer()" title="Reset Timer"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                    <button type="button" class="bm-tbtn-add5" id="btn-timer-add5" onclick="addFiveMinutes()" title="Add 5 More Minutes to Session">
+                        <i class="fa-solid fa-plus"></i> 5 Min Extension
+                    </button>
+                </div>
+            </div>
+
+            <!-- Unified 6-Item Info Grid (Exact Previous Layout with Dividing Borders) -->
+            <div class="bm-info-grid">
+                <div class="bm-info-item">
+                    <i class="fa-regular fa-clock"></i>
+                    <div>
+                        <span class="bm-info-label">SCHEDULED</span>
+                        <span class="bm-info-value" id="modal-time">...</span>
+                    </div>
+                </div>
+                <div class="bm-info-item">
+                    <i class="fa-solid fa-phone"></i>
+                    <div>
+                        <span class="bm-info-label">PHONE</span>
+                        <a class="bm-info-value bm-link" id="modal-phone" href="#">...</a>
+                    </div>
+                </div>
+                <div class="bm-info-item">
+                    <i class="fa-solid fa-cake-candles"></i>
+                    <div>
+                        <span class="bm-info-label">DOB</span>
+                        <span class="bm-info-value" id="modal-dob">...</span>
+                    </div>
+                </div>
+                <div class="bm-info-item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <div>
+                        <span class="bm-info-label">LOCATION</span>
+                        <span class="bm-info-value" id="modal-location">...</span>
+                    </div>
+                </div>
+                <div class="bm-info-item">
+                    <i class="fa-solid fa-tag"></i>
+                    <div>
+                        <span class="bm-info-label">FEES</span>
+                        <span class="bm-info-value" id="modal-amount">...</span>
+                    </div>
+                </div>
+                <div class="bm-info-item">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <div>
+                        <span class="bm-info-label">DURATION</span>
+                        <span class="bm-info-value" id="modal-duration">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Actions Row (Spacious, Full Width) -->
+            <div class="bm-actions-container">
+                <button type="button" class="bm-status-pill bm-pill-upcoming" data-status="Upcoming" onclick="changeModalStatus('Upcoming')">
+                    <i class="fa-solid fa-clock"></i> Upcoming
+                </button>
+                <button type="button" class="bm-status-pill bm-pill-completed" data-status="Completed" onclick="changeModalStatus('Completed')">
+                    <i class="fa-solid fa-check"></i> Done
+                </button>
+                <button type="button" class="bm-status-pill bm-pill-rescheduled" data-status="Rescheduled" onclick="changeModalStatus('Rescheduled')">
+                    <i class="fa-solid fa-calendar"></i> Reschedule
+                </button>
+                <button type="button" class="bm-status-pill bm-pill-cancelled" data-status="Cancelled" onclick="changeModalStatus('Cancelled')">
+                    <i class="fa-solid fa-ban"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Apps Script Code Modal Window -->
+    <div id="appscript-modal-overlay" class="bm-overlay hidden" onclick="closeAppScriptModal(event)">
+        <div class="appscript-card" onclick="event.stopPropagation()">
+            <!-- Top Accent Bar -->
+            <div class="bm-accent-bar" style="background: linear-gradient(90deg, #10b981, #3b82f6, #a855f7);"></div>
+
+            <!-- Top Header & Close -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); display: flex; align-items: center; justify-content: center; color: #60a5fa; font-size: 1.25rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: #ffffff;">Google Apps Script Code</h2>
+                        <p style="margin: 3px 0 0; font-size: 0.8rem; color: #9ca3af;">Deploy this in your Google Sheet's <strong>Code.gs</strong> to enable 2-way live sync</p>
+                    </div>
+                </div>
+                <button type="button" class="bm-icon-btn bm-close" onclick="closeAppScriptModal()" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- 3-Step Setup Instructions -->
+            <div class="appscript-steps-box">
+                <div class="appscript-step">
+                    <span class="appscript-step-num">1</span>
+                    <span>Open your Google Sheet, click <strong>Extensions</strong> &rarr; <strong>Apps Script</strong>.</span>
+                </div>
+                <div class="appscript-step">
+                    <span class="appscript-step-num">2</span>
+                    <span>Select all existing code in <strong>Code.gs</strong>, delete it, and paste the code below.</span>
+                </div>
+                <div class="appscript-step">
+                    <span class="appscript-step-num">3</span>
+                    <span>Click <strong>Deploy</strong> &rarr; <strong>New deployment</strong> &rarr; Select <strong>Web app</strong> &rarr; Set <em>"Who has access"</em> to <strong>Anyone</strong> &rarr; Copy the Web App URL into the <em>Google Apps Script URL</em> box.</span>
+                </div>
+            </div>
+
+            <!-- Code Container Header with Lock, Edit and Copy Buttons -->
+            <div class="appscript-code-header">
+                <div class="appscript-code-title">
+                    <i class="fa-brands fa-js" style="color: #f7df1e;"></i>
+                    <span>Code.gs</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <!-- Lock / Unlock Button -->
+                    <button type="button" class="btn-code-control btn-code-lock is-locked" id="btn-appscript-lock" onclick="toggleAppScriptLock()" title="Click to Unlock Editing">
+                        <i class="fa-solid fa-lock" id="icon-appscript-lock"></i>
+                        <span id="label-appscript-lock">Locked</span>
+                    </button>
+                    <!-- Pen / Edit Button -->
+                    <button type="button" class="btn-code-control btn-code-edit locked" id="btn-appscript-edit" onclick="handleAppScriptEditClick()" title="Unlock first to edit code">
+                        <i class="fa-solid fa-pen" id="icon-appscript-edit"></i>
+                        <span>Edit</span>
+                    </button>
+                    <!-- Copy Code Button -->
+                    <button type="button" class="btn-copy-code" id="btn-copy-appscript" onclick="copyAppScriptCode()">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy Code</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Code Preview Block -->
+            <div class="appscript-code-wrapper" id="appscript-wrapper">
+                <!-- Floating Save button inside edit box (visible only when editing) -->
+                <button type="button" id="btn-save-appscript" class="btn-appscript-save-inside" onclick="saveAppScriptCodeEdit()" title="Save changes and lock code">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Save Code</span>
+                </button>
+                <pre class="appscript-code-pre" id="appscript-code-pre"><code id="appscript-code-content">function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "online",
+    message: "Tarot CRM Google Sheet Webhook is active and running!"
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  try {
+    // Wait up to 10 seconds to prevent concurrent write collisions
+    lock.waitLock(10000);
+    
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    // 1. Ensure Header Row is Always Present
+    var headers = ["Booking ID", "Timestamp", "Client Name", "Phone", "DOB", "Location", "Scheduled Time", "Fees", "Duration", "Status"];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setFontWeight("bold")
+      .setBackground("#f3f4f6")
+      .setHorizontalAlignment("center");
+    
+    // 2. BULK SYNC (Triggered by the Sync Wheel in CRM or Deletions)
+    if (data.action === 'sync_all' && Array.isArray(data.bookings)) {
+      // Clear old rows and ghost/empty rows below Row 1
+      var lastRow = sheet.getLastRow();
+      if (lastRow > 1) {
+        sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent().clearFormat();
+      }
+      
+      if (data.bookings.length > 0) {
+        var rows = data.bookings.map(function(b) {
+          return [
+            b.id || '',
+            b.createdAt ? new Date(b.createdAt) : new Date(),
+            b.name || '',
+            b.phone ? "'" + b.phone : '',
+            b.dob || '',
+            b.location || '',
+            b.dateTimeStr || '',
+            b.amount || '₹349',
+            b.duration || '20 Mins',
+            b.status || 'Upcoming'
+          ];
+        });
+        
+        var range = sheet.getRange(2, 1, rows.length, headers.length);
+        range.setValues(rows);
+        range.setVerticalAlignment("middle");
+        
+        // Color-code the Status column (Column 10 / J)
+        for (var r = 0; r < rows.length; r++) {
+          var statusCell = sheet.getRange(r + 2, 10);
+          var st = (rows[r][9] || '').toLowerCase();
+          if (st === 'upcoming') {
+            statusCell.setBackground('#dbeafe').setFontColor('#1e40af'); // Blue
+          } else if (st === 'completed' || st === 'done') {
+            statusCell.setBackground('#d1fae5').setFontColor('#065f46'); // Green
+          } else if (st === 'cancelled') {
+            statusCell.setBackground('#fee2e2').setFontColor('#991b1b'); // Red
+          } else if (st === 'rescheduled') {
+            statusCell.setBackground('#fef3c7').setFontColor('#92400e'); // Yellow
+          }
+        }
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "synced",
+        count: data.bookings.length
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // 3. UPDATE STATUS (Matched STRICTLY by Booking ID!)
+    if (data.action === 'update_status') {
+      var lastRow = sheet.getLastRow();
+      var foundRow = -1;
+      
+      if (lastRow > 1) {
+        var idValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+        for (var i = 0; i < idValues.length; i++) {
+          // Strictly match by Booking ID only
+          if (String(idValues[i][0]).trim() === String(data.id).trim()) {
+            foundRow = i + 2;
+            break;
+          }
+        }
+      }
+      
+      if (foundRow > 0) {
+        var statusCell = sheet.getRange(foundRow, 10);
+        statusCell.setValue(data.status);
+        
+        var st = (data.status || '').toLowerCase();
+        if (st === 'upcoming') {
+          statusCell.setBackground('#dbeafe').setFontColor('#1e40af');
+        } else if (st === 'completed' || st === 'done') {
+          statusCell.setBackground('#d1fae5').setFontColor('#065f46');
+        } else if (st === 'cancelled') {
+          statusCell.setBackground('#fee2e2').setFontColor('#991b1b');
+        } else if (st === 'rescheduled') {
+          statusCell.setBackground('#fef3c7').setFontColor('#92400e');
+        }
+        
+        return ContentService.createTextOutput(JSON.stringify({ status: "updated", row: foundRow })).setMimeType(ContentService.MimeType.JSON);
+      } else {
+        // If booking wasn't in sheet yet, append it
+        sheet.appendRow([
+          data.id || '',
+          data.createdAt ? new Date(data.createdAt) : new Date(),
+          data.name || '',
+          data.phone ? "'" + data.phone : '',
+          data.dob || '',
+          data.location || '',
+          data.dateTimeStr || '',
+          data.amount || '₹349',
+          data.duration || '20 Mins',
+          data.status || 'Upcoming'
+        ]);
+        return ContentService.createTextOutput(JSON.stringify({ status: "created_on_update" })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    // 4. ADMIN PASSWORD RESET LINK (Clickable Hyperlink in Sheet)
+    if (data.action === 'password_reset') {
+      var resetFormula = '=HYPERLINK("' + data.resetLink + '", "CLICK TO RESET PASSWORD")';
+      sheet.appendRow([
+        "AUTH-RESET",
+        new Date(),
+        "ADMIN SECURITY",
+        "PASSWORD RESET",
+        "",
+        "Admin Portal",
+        resetFormula,
+        "",
+        "Valid 1 Hour",
+        "RESET LINK"
+      ]);
+      
+      var lastR = sheet.getLastRow();
+      sheet.getRange(lastR, 1, 1, headers.length).setBackground('#f3e8ff').setFontColor('#6b21a8');
+      sheet.getRange(lastR, 7).setFontWeight('bold').setFontColor('#2563eb');
+      sheet.getRange(lastR, 10).setBackground('#7e22ce').setFontColor('#ffffff').setFontWeight('bold').setHorizontalAlignment('center');
+      
+      return ContentService.createTextOutput(JSON.stringify({ status: "reset_link_added" })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 5. CREATE NEW BOOKING (From website checkout)
+    if (data.action === 'create' || !data.action) {
+      sheet.appendRow([
+        data.id || '',
+        data.createdAt ? new Date(data.createdAt) : new Date(),
+        data.name || '',
+        data.phone ? "'" + data.phone : '',
+        data.dob || '',
+        data.location || '',
+        data.dateTimeStr || '',
+        data.amount || '₹349',
+        data.duration || '20 Mins',
+        data.status || 'Upcoming'
+      ]);
+      var newRow = sheet.getLastRow();
+      formatStatusCell(sheet.getRange(newRow, 10), data.status || 'Upcoming');
+      return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    return ContentService.createTextOutput(JSON.stringify({ status: "unknown_action" })).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ error: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// Helper: Applies Pill Background, Font Color & Bold Centered Styling to Status Cell
+function formatStatusCell(cell, status) {
+  var st = String(status || '').toLowerCase().trim();
+  cell.setFontWeight("bold").setHorizontalAlignment("center");
+  
+  if (st === 'upcoming') {
+    cell.setBackground('#dbeafe').setFontColor('#1e40af'); // Light Blue / Dark Blue text
+  } else if (st === 'completed' || st === 'done' || st === 'complete') {
+    cell.setBackground('#d1fae5').setFontColor('#065f46'); // Light Green / Dark Green text
+  } else if (st === 'cancelled' || st === 'canceled' || st === 'cancel') {
+    cell.setBackground('#fee2e2').setFontColor('#991b1b'); // Light Red / Dark Red text
+  } else if (st === 'rescheduled' || st === 'reschedule') {
+    cell.setBackground('#fef3c7').setFontColor('#92400e'); // Light Yellow / Dark Amber text
+  } else if (st === 'reset link') {
+    cell.setBackground('#7e22ce').setFontColor('#ffffff'); // Purple badge
+  }
+}
+
+// Helper: Sets up Google Sheet Conditional Formatting on Column J (J2:J1000)
+function ensureConditionalFormatting(sheet) {
+  var rules = sheet.getConditionalFormatRules();
+  if (rules.length >= 4) return;
+  
+  var statusRange = sheet.getRange("J2:J1000");
+  var newRules = [];
+  
+  // Upcoming - Blue
+  newRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("Upcoming")
+    .setBackground("#dbeafe")
+    .setFontColor("#1e40af")
+    .setRanges([statusRange])
+    .build());
+    
+  // Completed - Green
+  newRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("Completed")
+    .setBackground("#d1fae5")
+    .setFontColor("#065f46")
+    .setRanges([statusRange])
+    .build());
+    
+  // Cancelled - Red
+  newRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("Cancelled")
+    .setBackground("#fee2e2")
+    .setFontColor("#991b1b")
+    .setRanges([statusRange])
+    .build());
+
+  // Canceled (single L) - Red
+  newRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("Canceled")
+    .setBackground("#fee2e2")
+    .setFontColor("#991b1b")
+    .setRanges([statusRange])
+    .build());
+    
+  // Rescheduled - Yellow
+  newRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("Rescheduled")
+    .setBackground("#fef3c7")
+    .setFontColor("#92400e")
+    .setRanges([statusRange])
+    .build());
+    
+  sheet.setConditionalFormatRules(newRules);
+}</code></pre>
+                <textarea id="appscript-code-editor" class="appscript-code-textarea" spellcheck="false" placeholder="Write or edit your Google Apps Script code here..."></textarea>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 18px;">
+                <button type="button" class="btn-secondary" onclick="closeAppScriptModal()" style="background: rgba(255, 255, 255, 0.08); color: #d1d5db; border: 1px solid rgba(255, 255, 255, 0.15); padding: 10px 22px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+                    Close
+                </button>
+                <button type="button" class="btn-primary" onclick="copyAppScriptCode()" style="padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <i class="fa-regular fa-copy"></i> Copy Code
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Preview Modal (Scan QR Code or Open Link) -->
+    <div id="mobile-preview-modal-overlay" class="bm-overlay hidden" onclick="closeMobilePreviewModal(event)">
+        <div class="bm-card" style="max-width: 480px; text-align: center; padding: 28px 24px;" onclick="event.stopPropagation()">
+            <div class="bm-accent-bar" style="background: linear-gradient(135deg, #833ab4, #e1306c, #f77737);"></div>
+            
+            <div style="position: absolute; top: 16px; right: 18px;">
+                <button type="button" class="bm-icon-btn bm-close" onclick="closeMobilePreviewModal()" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(247, 119, 55, 0.2)); color: #f472b6; font-size: 1.6rem; margin-bottom: 12px; border: 1px solid rgba(225, 48, 108, 0.35);">
+                <i class="fa-solid fa-mobile-screen"></i>
+            </div>
+
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: #ffffff; margin-bottom: 6px;">
+                Mobile Phone Preview
+            </h2>
+            <p style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 18px;">
+                Scan with your phone camera or open the link on your mobile phone (connected to same Wi-Fi).
+            </p>
+
+            <!-- Page Switcher Tabs -->
+            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 18px;">
+                <button type="button" id="tab-mob-offer" onclick="switchMobilePreviewTab('offer')" style="padding: 7px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; cursor: pointer; border: 1px solid #e1306c; background: #e1306c; color: white;">
+                    Exclusive Offer Page
+                </button>
+                <button type="button" id="tab-mob-home" onclick="switchMobilePreviewTab('home')" style="padding: 7px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #cbd5e1;">
+                    Main Website
+                </button>
+            </div>
+
+            <!-- QR Code Card -->
+            <div style="background: #ffffff; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 18px;">
+                <img id="mobile-qr-img" src="" alt="Scan QR Code" style="width: 170px; height: 170px; display: block; border-radius: 8px;">
+            </div>
+
+            <!-- Link Box with Copy Button -->
+            <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; text-align: left;">
+                <span id="mobile-url-text" style="font-family: monospace; font-size: 0.85rem; color: #38bdf8; word-break: break-all;">
+                    Loading...
+                </span>
+                <button type="button" onclick="copyMobileUrl(this)" class="btn-primary" style="padding: 7px 14px; font-size: 0.8rem; border-radius: 8px; white-space: nowrap; flex-shrink: 0; cursor: pointer;">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+            </div>
+
+            <p style="font-size: 0.78rem; color: #64748b; margin: 0;">
+                💡 <span style="color: #94a3b8;">Tip: Connect your phone to the same Wi-Fi network for instant access with zero lag.</span>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | TrikalDarshi Tarot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #0b0914;
+            --card-bg: #111827;
+            --primary-color: #eab308;
+            --accent-purple: #8b5cf6;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 15%, rgba(139, 92, 246, 0.18) 0%, transparent 60%),
+                radial-gradient(circle at 80% 80%, rgba(234, 179, 8, 0.08) 0%, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 36px 32px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        .login-accent-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #f59e0b);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .login-badge-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(234, 179, 8, 0.25));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .login-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+            margin-bottom: 6px;
+        }
+
+        .login-header p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #d1d5db;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: #6b7280;
+            font-size: 0.95rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 13px 42px 13px 40px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #8b5cf6;
+            background: rgba(0, 0, 0, 0.55);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+        }
+
+        .form-input:focus + .input-icon,
+        .input-wrapper:focus-within .input-icon {
+            color: #a855f7;
+        }
+
+        .btn-toggle-eye {
+            position: absolute;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .btn-toggle-eye:hover {
+            color: #ffffff;
+        }
+
+        .login-options-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 0.83rem;
+        }
+
+        .remember-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-label input[type="checkbox"] {
+            accent-color: #8b5cf6;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #eab308, #d97706);
+            color: #0b0914;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 18px rgba(234, 179, 8, 0.3);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(234, 179, 8, 0.45);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert-box {
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
+        }
+
+        /* View Switching Animation */
+        .auth-view {
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .auth-view.hidden {
+            display: none;
+            opacity: 0;
+            transform: scale(0.96);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-decoration: none;
+            margin-top: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #ffffff;
+        }
+
+        .sheet-info-pill {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.82rem;
+            color: #a7f3d0;
+            line-height: 1.45;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .sheet-info-pill i {
+            color: #10b981;
+            font-size: 1.1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .direct-reset-btn {
+            display: inline-block;
+            margin-top: 10px;
+            background: #3b82f6;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-accent-bar"></div>
+
+            <!-- VIEW 1: LOGIN FORM -->
+            <div id="view-login" class="auth-view">
+                <div class="login-header">
+                    <div class="login-badge-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h1>Admin Portal</h1>
+                    <p>Enter your credentials to access the management portal</p>
+                </div>
+
+                <div id="login-alert" class="alert-box alert-error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="login-alert-text">Invalid username or password.</span>
+                </div>
+
+                <form id="form-login" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="login-username">Admin ID / Username</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input type="text" id="login-username" class="form-input" placeholder="admin" value="admin" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="login-password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-eye" onclick="togglePasswordVisibility('login-password', this)" title="Show / Hide Password">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="login-options-row">
+                        <label class="remember-label">
+                            <input type="checkbox" id="login-remember" checked>
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link" onclick="switchView('forgot')">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btn-login-submit">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                        <span>Sign In to Dashboard</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- VIEW 2: FORGOT / RESET PASSWORD VIA GOOGLE SHEET -->
+            <div id="view-forgot" class="auth-view hidden">
+                <div class="login-header">
+                    <div class="login-badge-icon" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
+                        <i class="fa-solid fa-file-excel"></i>
+                    </div>
+                    <h1>Reset via Google Sheet</h1>
+                    <p>A secure password reset link will be posted to your connected Google Sheet</p>
+                </div>
+
+                <div class="sheet-info-pill">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>For maximum security, your password reset link is delivered straight to your Google Sheet so only authorized sheet owners can reset it.</span>
+                </div>
+
+                <div id="forgot-alert" class="alert-box">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span id="forgot-alert-text"></span>
+                </div>
+
+                <form id="form-forgot" onsubmit="handleForgotPassword(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="forgot-username">Confirm Admin ID</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input type="text" id="forgot-username" class="form-input" placeholder="admin" value="admin" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btn-forgot-submit" style="background: linear-gradient(135deg, #10b981, #059669); color: #ffffff;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Send Reset Link to Google Sheet</span>
+                    </button>
+                </form>
+
+                <div style="text-align: center;">
+                    <a href="#" class="back-link" onclick="switchView('login')">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Sign In
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Check if already authenticated on load
+        (async function checkExistingAuth() {
+            try {
+                const res = await fetch('/api/auth/check');
+                const data = await res.json();
+                if (data.authenticated) {
+                    window.location.replace('/admin.html');
+                }
+            } catch (e) {}
+        })();
+
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function switchView(viewName) {
+            const viewLogin = document.getElementById('view-login');
+            const viewForgot = document.getElementById('view-forgot');
+            const loginAlert = document.getElementById('login-alert');
+            const forgotAlert = document.getElementById('forgot-alert');
+            
+            loginAlert.style.display = 'none';
+            forgotAlert.style.display = 'none';
+
+            if (viewName === 'forgot') {
+                viewLogin.classList.add('hidden');
+                viewForgot.classList.remove('hidden');
+            } else {
+                viewForgot.classList.add('hidden');
+                viewLogin.classList.remove('hidden');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            const alertBox = document.getElementById('login-alert');
+            const alertText = document.getElementById('login-alert-text');
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const rememberMe = document.getElementById('login-remember').checked;
+
+            alertBox.style.display = 'none';
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Verifying...</span>';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, rememberMe })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    btn.style.background = '#10b981';
+                    btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Success! Redirecting...</span>';
+                    if (data.token) {
+                        localStorage.setItem('admin_token', data.token);
+                    }
+                    setTimeout(() => {
+                        window.location.href = '/admin.html';
+                    }, 400);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnHtml;
+                    alertBox.className = 'alert-box alert-error';
+                    alertBox.style.display = 'flex';
+                    alertText.innerText = data.error || 'Invalid credentials. Please try again.';
+                }
+            } catch (err) {
+                console.error('Login error', err);
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+                alertBox.className = 'alert-box alert-error';
+                alertBox.style.display = 'flex';
+                alertText.innerText = 'Server error. Please ensure the backend server is running.';
+            }
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-forgot-submit');
+            const alertBox = document.getElementById('forgot-alert');
+            const alertText = document.getElementById('forgot-alert-text');
+            const username = document.getElementById('forgot-username').value.trim();
+
+            alertBox.style.display = 'none';
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Sending to Google Sheet...</span>';
+
+            try {
+                const res = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                const data = await res.json();
+
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+
+                if (res.ok && data.success) {
+                    alertBox.className = 'alert-box alert-success';
+                    alertBox.style.display = 'block';
+                    
+                    if (data.sheetConnected) {
+                        alertText.innerHTML = `<strong><i class="fa-solid fa-circle-check"></i> Reset Link Dispatched!</strong><br>${data.message}`;
+                    } else if (data.resetLink) {
+                        alertText.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> Sheet Not Connected Yet:</strong><br>${data.message}<br><a href="${data.resetLink}" class="direct-reset-btn">Click Here to Reset Now</a>`;
+                    } else {
+                        alertText.innerText = data.message;
+                    }
+                } else {
+                    alertBox.className = 'alert-box alert-error';
+                    alertBox.style.display = 'flex';
+                    alertText.innerText = data.error || 'Failed to generate reset link.';
+                }
+            } catch (err) {
+                console.error('Forgot password error', err);
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+                alertBox.className = 'alert-box alert-error';
+                alertBox.style.display = 'flex';
+                alertText.innerText = 'Connection error. Please ensure the backend server is running.';
+            }
+        }
+    </script>
+</body>
+</html>

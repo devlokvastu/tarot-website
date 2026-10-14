@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Select Timing | TrikalDarshi Tarot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="booking.css?v=37">
+    <style>
+        .client-input.input-error {
+            border: 1.5px solid #ef4444 !important;
+            background-color: #fff8f8 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+            outline: none !important;
+        }
+
+        .input-shake {
+            animation: inputShakeJitter 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        @keyframes inputShakeJitter {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-7px); }
+            30% { transform: translateX(7px); }
+            45% { transform: translateX(-5px); }
+            60% { transform: translateX(5px); }
+            75% { transform: translateX(-2px); }
+            90% { transform: translateX(2px); }
+        }
+
+        .next-avail.slot-error {
+            border-radius: 8px;
+            padding: 4px 8px;
+            border: 1.5px solid #ef4444;
+            background-color: #fff8f8;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body class="booking-page">
+
+    <div class="booking-wrapper">
+        <div class="booking-card">
+            
+            <!-- Header Summary (Always Visible) -->
+            <div class="b-header">
+                <div>
+                    <div class="b-plan-name" id="selected-plan-name">Tarot Reading Session</div>
+                    <div class="b-price-badge">
+                        <span class="old-price" id="header-old-price">₹4000</span>
+                        <span class="current-price" id="header-cur-price">₹2500</span>
+                    </div>
+                </div>
+                <div class="b-rating-badge">★ 5.0</div>
+            </div>
+
+            <!-- STEP 1: DATE & TIME SELECTION -->
+            <div id="step-1">
+                <!-- Date Picker -->
+                <div class="b-section">
+                    <h3 class="b-title">When should we connect?</h3>
+                    <div class="carousel-container">
+                        <button class="slider-btn prev-btn" id="slide-left">❮</button>
+                        <div class="date-carousel">
+                            <p style="text-align:center; width:100%; color:#6b7280;">Loading available dates...</p>
+                        </div>
+                        <button class="slider-btn next-btn" id="slide-right">❯</button>
+                    </div>
+                </div>
+
+                <!-- Time Picker -->
+                <div class="b-section">
+                    <div class="b-title-row">
+                        <h3 class="b-title">Select your preferred time slot</h3>
+                        <span class="timezone-icon">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                            GMT+5:30 Asia/Calcutta
+                        </span>
+                    </div>
+                    
+                    <div class="time-filters">
+                        <button class="t-filter filter-morning">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m8 6 4-4 4 4"/><path d="M22 22H2"/><path d="M8 18a4 4 0 0 1 8 0"/></svg>
+                            Morning
+                        </button>
+                        <button class="t-filter filter-midday active">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                            Midday
+                        </button>
+                        <button class="t-filter filter-evening">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2"/><path d="m18.36 5.64-1.42 1.42"/><path d="m5.64 5.64 1.42 1.42"/><path d="M21 11h-2"/><path d="M5 11H3"/><path d="M7 15a5 5 0 0 1 10 0"/><path d="M2 15h20"/><path d="M7 19h10"/></svg>
+                            Evening
+                        </button>
+                    </div>
+
+                    <div class="time-grid">
+                        <!-- Dynamic slots load here -->
+                    </div>
+                </div>
+
+                <!-- Ratings Overview -->
+                <div class="b-section" style="margin-top: 20px;">
+                    <h3 class="b-title">Ratings & Reviews</h3>
+                    <div class="tags-container">
+                        <span class="review-tag">Value for money <span class="count">8</span></span>
+                        <span class="review-tag">Professional <span class="count">13</span></span>
+                        <span class="review-tag">Accuracy <span class="count">21</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: CLIENT DETAILS FORM -->
+            <div id="step-2" style="display: none;">
+                <div class="b-title-row" style="margin-top: 10px; margin-bottom: 5px;">
+                    <h3 class="b-title" style="margin-bottom: 0;">Your Details</h3>
+                    <span style="font-size: 0.85rem; color: #0066ff; cursor: pointer; font-weight: 500;" onclick="goToStep1()">← Back to times</span>
+                </div>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 22px;">Please provide your information for the reading.</p>
+                
+                <div class="client-form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="client-name" class="client-input" placeholder="e.g. Rahul Sharma" required>
+                </div>
+                <div class="client-form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="client-dob" class="client-input" required>
+                </div>
+                <div class="client-form-group">
+                    <label>Contact Number (WhatsApp)</label>
+                    <input type="tel" id="client-phone" class="client-input" placeholder="+91 98765 43210" required>
+                </div>
+                <div class="client-form-group">
+                    <label>Current Location</label>
+                    <input type="text" id="client-location" class="client-input" placeholder="City, Country" required>
+                </div>
+            </div>
+
+            <!-- Sticky Footer (Always Visible) -->
+            <div class="b-footer">
+                <div class="next-avail">
+                    <span class="label">Selected Slot</span>
+                    <span class="value" id="selected-datetime">Please select a slot</span>
+                </div>
+                <button class="confirm-btn" id="main-action-btn" onclick="goToStep2()" disabled style="opacity: 0.5;">Next</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Read the plan ID from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const planId = urlParams.get('plan') || '0';
+
+        // Load Plan Header dynamically
+        async function loadPlanHeader() {
+            try {
+                const res = await fetch('/api/config');
+                const db = await res.json();
+                let plan = null;
+                if (planId === 'unlisted' && db.unlistedPlan) {
+                    plan = db.unlistedPlan;
+                } else if (db.plans && db.plans.length > 0) {
+                    const pIdx = parseInt(planId) || 0;
+                    plan = db.plans[pIdx] || db.plans[0];
+                }
+                
+                if (plan) {
+                    const pPrice = parseInt(plan.price) || 999;
+                    const pOld = plan.originalPrice ? parseInt(plan.originalPrice) : Math.round(pPrice * 1.5);
+                    
+                    const curPriceEl = document.getElementById('header-cur-price');
+                    const oldPriceEl = document.getElementById('header-old-price');
+                    const planNameEl = document.getElementById('selected-plan-name');
+                    
+                    if (curPriceEl) curPriceEl.innerText = `₹${pPrice}`;
+                    if (oldPriceEl) oldPriceEl.innerText = `₹${pOld}`;
+                    if (planNameEl) planNameEl.innerText = plan.name;
+                }
+                if (db.content && db.content.siteName) {
+                    document.title = `Select Timing | ${db.content.siteName}`;
+                }
+            } catch(e) {
+                console.error("Failed to load plan header", e);
+            }
+        }
+        loadPlanHeader();
+
+        // Real Backend Integration for Slots
+        async function loadSlots() {
+            try {
+                const res = await fetch(`/api/slots?plan=${planId}`);
+                const data = await res.json();
+                
+                const dateCarousel = document.querySelector('.date-carousel');
+                const timeGrid = document.querySelector('.time-grid');
+                const timeFilters = document.querySelectorAll('.t-filter');
+                
+                dateCarousel.innerHTML = ''; 
+                
+                if (!data || data.length === 0) {
+                    dateCarousel.innerHTML = '<p style="text-align:center; width:100%; color:#6b7280;">No dates available right now.</p>';
+                    return;
+                }
+                
+                // 1. Render Date Cards dynamically
+                data.forEach((dayData, index) => {
+                    let slotsClass = 'slots-low';
+                    if (dayData.slotCount > 5) slotsClass = 'slots-med';
+                    if (dayData.slotCount > 10) slotsClass = 'slots-high';
+                    
+                    const div = document.createElement('div');
+                    div.className = `date-card ${index === 0 ? 'active' : ''}`;
+                    div.dataset.index = index;
+                    div.innerHTML = `
+                        <span class="day">${dayData.dayName}</span>
+                        <span class="date">${dayData.dayNum} ${dayData.monthStr}</span>
+                        <span class="slots ${slotsClass}">${dayData.slotCount} slots</span>
+                    `;
+                    
+                    div.addEventListener('click', () => {
+                        document.querySelectorAll('.date-card').forEach(el => el.classList.remove('active'));
+                        div.classList.add('active');
+                        renderTimeSlots(dayData);
+                    });
+                    
+                    dateCarousel.appendChild(div);
+                    
+                    if (index === 0) {
+                        renderTimeSlots(dayData);
+                    }
+                });
+
+                // 2. Helper to Render Time Slots
+                function renderTimeSlots(dayData) {
+                    timeGrid.innerHTML = '';
+                    const activeFilter = document.querySelector('.t-filter.active').textContent.trim();
+                    
+                    const filteredSlots = dayData.slots.filter(s => s.type === activeFilter);
+                    
+                    if (filteredSlots.length === 0) {
+                        timeGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #6b7280; font-size: 0.9rem; padding: 15px 0;">No ${activeFilter} slots available today.</p>`;
+                    } else {
+                        filteredSlots.forEach((slot, i) => {
+                            const btn = document.createElement('button');
+                            btn.className = `time-btn ${i === 0 ? 'active' : ''}`;
+                            btn.innerText = slot.time;
+                            
+                            btn.addEventListener('click', () => {
+                                document.querySelectorAll('.time-btn').forEach(el => el.classList.remove('active'));
+                                btn.classList.add('active');
+                                updateFooterText(slot.time, dayData);
+                            });
+                            
+                            timeGrid.appendChild(btn);
+                            if (i === 0) updateFooterText(slot.time, dayData);
+                        });
+                    }
+                    
+                    const actionBtn = document.getElementById('main-action-btn');
+                    if (filteredSlots.length === 0) {
+                        document.getElementById('selected-datetime').innerText = 'No slots available';
+                        actionBtn.disabled = true;
+                        actionBtn.style.opacity = '0.5';
+                    } else {
+                        actionBtn.disabled = false;
+                        actionBtn.style.opacity = '1';
+                    }
+                }
+
+                // 3. Filter Interaction
+                timeFilters.forEach(filter => {
+                    filter.addEventListener('click', () => {
+                        timeFilters.forEach(f => f.classList.remove('active'));
+                        filter.classList.add('active');
+                        const activeCard = document.querySelector('.date-card.active');
+                        if (activeCard) {
+                            const dayData = data[activeCard.dataset.index];
+                            if (dayData) renderTimeSlots(dayData);
+                        }
+                    });
+                });
+
+            } catch(e) {
+                console.error("Failed to load slots from backend", e);
+                document.querySelector('.date-carousel').innerHTML = '<p style="color:red; font-size:0.9rem;">Could not connect to API server.</p>';
+            }
+        }
+
+        function updateFooterText(time, dayData) {
+            const dayLower = dayData.dayName.charAt(0) + dayData.dayName.slice(1).toLowerCase();
+            const formatted = `${time}, ${dayLower}, ${dayData.dayNum} ${dayData.monthStr}`;
+            document.getElementById('selected-datetime').innerText = formatted;
+            const nextAvail = document.querySelector('.next-avail');
+            if (nextAvail) {
+                nextAvail.classList.remove('slot-error', 'input-shake');
+            }
+        }
+
+        // Validation helper functions
+        function markInputError(el) {
+            if (!el) return;
+            el.classList.remove('input-shake');
+            void el.offsetWidth; // Force reflow to re-trigger jitter animation
+            el.classList.add('input-error', 'input-shake');
+        }
+
+        function clearInputError(el) {
+            if (!el) return;
+            el.classList.remove('input-error', 'input-shake');
+        }
+
+        // Multistep Flow
+        function goToStep2() {
+            const dateTimeEl = document.getElementById('selected-datetime');
+            const dateTimeStr = dateTimeEl ? dateTimeEl.innerText.trim() : '';
+
+            if (!dateTimeStr || dateTimeStr === 'Please select a slot' || dateTimeStr === 'No slots available') {
+                const nextAvail = document.querySelector('.next-avail');
+                if (nextAvail) {
+                    nextAvail.classList.remove('input-shake');
+                    void nextAvail.offsetWidth;
+                    nextAvail.classList.add('slot-error', 'input-shake');
+                    setTimeout(() => nextAvail.classList.remove('input-shake'), 600);
+                }
+                const timeGrid = document.querySelector('.time-grid');
+                if (timeGrid) {
+                    timeGrid.classList.remove('input-shake');
+                    void timeGrid.offsetWidth;
+                    timeGrid.classList.add('input-shake');
+                    setTimeout(() => timeGrid.classList.remove('input-shake'), 600);
+                }
+                return;
+            }
+
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
+            
+            const btn = document.getElementById('main-action-btn');
+            btn.innerText = 'Confirm Details';
+            btn.setAttribute('onclick', 'startRazorpayPayment(this)');
+        }
+
+        function goToStep1() {
+            document.getElementById('step-2').style.display = 'none';
+            document.getElementById('step-1').style.display = 'block';
+            
+            const btn = document.getElementById('main-action-btn');
+            btn.innerText = 'Next';
+            btn.setAttribute('onclick', 'goToStep2()');
+        }
+
+        // Real Backend Booking Process
+        async function startRazorpayPayment(btn) {
+            // Validation
+            const nameInput = document.getElementById('client-name');
+            const dobInput = document.getElementById('client-dob');
+            const phoneInput = document.getElementById('client-phone');
+            const locInput = document.getElementById('client-location');
+
+            const name = nameInput ? nameInput.value.trim() : '';
+            const dob = dobInput ? dobInput.value : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const loc = locInput ? locInput.value.trim() : '';
+            const dateTimeStr = document.getElementById('selected-datetime').innerText;
+
+            const fieldsToCheck = [
+                { el: nameInput, val: name },
+                { el: dobInput, val: dob },
+                { el: phoneInput, val: phone },
+                { el: locInput, val: loc }
+            ];
+
+            let hasEmpty = false;
+            let firstEmpty = null;
+
+            fieldsToCheck.forEach(item => {
+                if (!item.el) return;
+                if (!item.val) {
+                    hasEmpty = true;
+                    markInputError(item.el);
+                    if (!firstEmpty) firstEmpty = item.el;
+                } else {
+                    clearInputError(item.el);
+                }
+            });
+
+            if (hasEmpty) {
+                if (firstEmpty) firstEmpty.focus();
+                return;
+            }
+
+            if (dateTimeStr === 'Please select a slot' || dateTimeStr === 'No slots available' || !dateTimeStr) {
+                goToStep1();
+                const nextAvail = document.querySelector('.next-avail');
+                if (nextAvail) {
+                    nextAvail.classList.remove('input-shake');
+                    void nextAvail.offsetWidth;
+                    nextAvail.classList.add('slot-error', 'input-shake');
+                    setTimeout(() => nextAvail.classList.remove('input-shake'), 600);
+                }
+                return;
+            }
+
+            btn.innerHTML = 'Processing Booking...';
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+            
+            try {
+                // Real booking API call that triggers Google Integrations on backend
+                const res = await fetch('/api/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, dob, phone, location: loc, dateTimeStr, planId })
+                });
+
+                if (res.ok) {
+                    btn.innerHTML = 'Connecting to Payment...';
+                    setTimeout(() => {
+                        window.location.href = 'success.html';
+                    }, 800);
+                } else {
+                    throw new Error("Server returned error");
+                }
+            } catch (error) {
+                console.error("Booking failed", error);
+                alert("Something went wrong with the booking. Please try again.");
+                btn.innerHTML = 'Confirm Details';
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Auto-clear error borders on user typing or change
+        ['client-name', 'client-dob', 'client-phone', 'client-location'].forEach(id => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.addEventListener('input', () => {
+                if (input.value.trim()) clearInputError(input);
+            });
+            input.addEventListener('change', () => {
+                if (input.value.trim()) clearInputError(input);
+            });
+            input.addEventListener('animationend', () => {
+                input.classList.remove('input-shake');
+            });
+        });
+
+        // Slider Navigation Controls
+        document.getElementById('slide-left').addEventListener('click', () => {
+            document.querySelector('.date-carousel').scrollBy({ left: -150, behavior: 'smooth' });
+        });
+        document.getElementById('slide-right').addEventListener('click', () => {
+            document.querySelector('.date-carousel').scrollBy({ left: 150, behavior: 'smooth' });
+        });
+
+        // Boot
+        loadSlots();
+    </script>
+</body>
+</html>
