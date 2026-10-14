@@ -14,6 +14,10 @@
     box-sizing: border-box;
 }
 
+button, input, select, textarea {
+    font-family: inherit;
+}
+
 html {
     scroll-behavior: smooth;
     overflow-x: hidden;
@@ -396,12 +400,15 @@ header {
     background: var(--ig-gradient);
     color: #ffffff;
     border: none;
-    padding: 10px 20px;
+    padding: 11px 24px;
     border-radius: 25px;
-    font-weight: 700;
+    font-family: var(--font-sans), 'Poppins', sans-serif !important;
+    font-weight: 700 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     cursor: pointer;
-    transition: box-shadow 0.3s ease, filter 0.3s ease;
-    font-size: 0.92rem;
+    transition: box-shadow 0.3s ease, filter 0.3s ease, transform 0.2s ease;
+    font-size: 0.96rem;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
@@ -627,7 +634,7 @@ footer {
         box-sizing: border-box;
     }
     .plan-card {
-        padding: 18px 16px;
+        padding: 18px 14px;
         border-radius: 16px;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
         width: 100%;
@@ -667,12 +674,16 @@ footer {
         flex-shrink: 0;
     }
     .plan-btn {
-        padding: 12px 22px;
-        font-size: 0.96rem;
-        font-weight: 700;
+        padding: 11px 20px;
+        font-size: 0.98rem;
+        font-weight: 700 !important;
+        font-family: var(--font-sans), 'Poppins', sans-serif !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        min-width: 158px;
         border-radius: 25px;
         min-height: 44px;
-        letter-spacing: 0.25px;
+        letter-spacing: 0.2px;
         white-space: nowrap;
         flex-shrink: 0;
         display: inline-flex;
@@ -728,11 +739,15 @@ footer {
         font-size: 1.1rem;
     }
     .plan-btn {
-        padding: 10px 16px;
-        font-size: 0.88rem;
-        font-weight: 700;
+        padding: 11px 20px;
+        font-size: 0.94rem;
+        font-weight: 700 !important;
+        font-family: var(--font-sans), 'Poppins', sans-serif !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        min-width: 155px;
         border-radius: 22px;
-        min-height: 40px;
+        min-height: 42px;
     }
     .plan-duration {
         font-size: 0.82rem;
