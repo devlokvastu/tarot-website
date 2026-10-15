@@ -157,8 +157,8 @@
         // Load Plan Header dynamically
         async function loadPlanHeader() {
             try {
-           
-                const res = await fetch('https://trikaldarshi-tarot.onrender.com/api/config');
+                const res = await fetch('/api/config');
+                const db = await res.json();
                 window.siteConfig = db;
                 let plan = null;
                 if (planId === 'unlisted' && db.unlistedPlan) {
@@ -193,7 +193,7 @@
         // Real Backend Integration for Slots
         async function loadSlots() {
             try {
-                const res = await fetch(`https://trikaldarshi-tarot.onrender.com/api/slots?planID=${planID}`);
+                const res = await fetch(`/api/slots?plan=${planId}`);
                 const data = await res.json();
                 
                 const dateCarousel = document.querySelector('.date-carousel');
