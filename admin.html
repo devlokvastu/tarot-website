@@ -63,9 +63,14 @@
             
             <!-- 1. Availability Manager -->
             <section id="panel-availability" class="panel active">
-                <div class="panel-header">
-                    <h1>When are you available?</h1>
-                    <p>Choose the days and times that work for you.</p>
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1>When are you available?</h1>
+                        <p>Choose the days and times that work for you.</p>
+                    </div>
+                    <button type="button" class="btn-sync-wheel btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Full Screen View">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
                 </div>
                 
                 <div class="card availability-card">
@@ -188,9 +193,14 @@
 
             <!-- 1.5. Block Dates Manager with Interactive Calendar -->
             <section id="panel-blocked" class="panel">
-                <div class="panel-header">
-                    <h1>Block Dates</h1>
-                    <p>Select date ranges on the calendar below to mark as unavailable (vacations, retreats, personal time off).</p>
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1>Block Dates</h1>
+                        <p>Select date ranges on the calendar below to mark as unavailable (vacations, retreats, personal time off).</p>
+                    </div>
+                    <button type="button" class="btn-sync-wheel btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Full Screen View">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
                 </div>
                 
                 <div class="card" style="padding: 30px;">
@@ -285,9 +295,14 @@
                         <h1>Website Content & Text CMS</h1>
                         <p>Complete control to edit all headlines, descriptions, taglines, and text across your entire website.</p>
                     </div>
-                    <button type="button" id="top-content-save-btn" class="btn-primary" style="padding: 10px 22px; font-size: 0.95rem;">
-                        <i class="fa-solid fa-floppy-disk"></i> Save Content
-                    </button>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button type="button" class="btn-sync-wheel btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Full Screen View">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+                        <button type="button" id="top-content-save-btn" class="btn-primary" style="padding: 10px 22px; font-size: 0.95rem;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Content
+                        </button>
+                    </div>
                 </div>
 
                 <form id="form-content">
@@ -499,9 +514,14 @@
             
             <!-- 4. Plan Editor -->
             <section id="panel-plans" class="panel">
-                <div class="panel-header">
-                    <h1>Manage Reading Plans</h1>
-                    <p>Edit your pricing tiers and features.</p>
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1>Manage Reading Plans</h1>
+                        <p>Edit your pricing tiers and features.</p>
+                    </div>
+                    <button type="button" class="btn-sync-wheel btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Full Screen View">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
                 </div>
 
                 <form id="form-plans">
@@ -787,6 +807,9 @@ Personalized Remedies &amp; Guidance
                         <button type="button" class="btn-sync-wheel" id="btn-sync-wheel" onclick="syncGoogleSheets(this)" title="Sync with Google Sheets">
                             <i class="fa-solid fa-arrows-rotate"></i>
                         </button>
+                        <button type="button" class="btn-sync-wheel btn-fullscreen-toggle" id="btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Full Screen View">
+                            <i class="fa-solid fa-expand" id="fullscreen-icon"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -835,9 +858,14 @@ Personalized Remedies &amp; Guidance
 
             <!-- 6. Integrations -->
             <section id="panel-integrations" class="panel">
-                <div class="panel-header">
-                    <h1>Integrations</h1>
-                    <p>Connect third-party services to automate your bookings.</p>
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1>Integrations</h1>
+                        <p>Connect third-party services to automate your bookings.</p>
+                    </div>
+                    <button type="button" class="btn-sync-wheel btn-fullscreen-toggle" onclick="toggleFullScreen()" title="Full Screen View">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
                 </div>
 
                 <!-- Google Sheets Webhook Card -->

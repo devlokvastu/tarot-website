@@ -2754,3 +2754,50 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// ===== ONE-CLICK FULL SCREEN CONTROLLER =====
+window.toggleFullScreen = function() {
+    try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log('Fullscreen error:', err));
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(err => console.log('Exit fullscreen error:', err));
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    } catch (err) {
+        console.error("Fullscreen toggle failed:", err);
+    }
+};
+
+function updateFullScreenUI() {
+    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    document.querySelectorAll('.btn-fullscreen-toggle').forEach(btn => {
+        btn.classList.toggle('is-fullscreen', isFS);
+        btn.setAttribute('title', isFS ? 'Exit Full Screen' : 'Full Screen View');
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = isFS ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+        }
+    });
+}
+
+document.addEventListener('fullscreenchange', updateFullScreenUI);
+document.addEventListener('webkitfullscreenchange', updateFullScreenUI);
+document.addEventListener('mozfullscreenchange', updateFullScreenUI);
+document.addEventListener('MSFullscreenChange', updateFullScreenUI);
