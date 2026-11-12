@@ -146,6 +146,311 @@ app.get('/login.html', (req, res, next) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
+// --- Dynamic Server-Side Rendering (SSR) & Pre-rendering Helpers ---
+function escapeHtml(str) {
+    if (typeof str !== 'string') return str || '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function renderIndexHtml(html, db) {
+    const c = db.content || {};
+    const plans = db.plans || [];
+
+    const safeConfig = {
+        content: c,
+        plans: plans,
+        settings: db.settings || {},
+        unlistedPlan: db.unlistedPlan || null
+    };
+
+    // 1. Title
+    if (c.siteName && c.readerName) {
+        html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(c.siteName)} | ${escapeHtml(c.readerName)}</title>`);
+    }
+
+    // 2. Logo
+    if (c.siteName) {
+        html = html.replace(/<div class="logo">[\s\S]*?<\/div>/i, `<div class="logo">${escapeHtml(c.siteName)}</div>`);
+    }
+
+    // 3. Profile Pic
+    if (c.profilePic) {
+        let pic = c.profilePic;
+        if (pic.includes('localhost') || pic.includes('127.0.0.1')) {
+            pic = pic.replace(/^https?:\/\/[^\/]+\/?/, '');
+            if (!pic) pic = 'profile.jpg';
+        }
+        html = html.replace(/(<img\s+[^>]*?class="profile-pic"[^>]*?>)/i, (match) => {
+            let replaced = match.replace(/src="[^"]*"/i, `src="${pic}"`);
+            if (c.readerName) {
+                replaced = replaced.replace(/alt="[^"]*"/i, `alt="${escapeHtml(c.readerName)}"`);
+            }
+            return replaced;
+        });
+    }
+
+    // 4. Hero H1
+    if (c.headerText) {
+        html = html.replace(/(<section class="hero">[\s\S]*?)<h1>[\s\S]*?<\/h1>/i, `$1<h1>${c.headerText}</h1>`);
+    }
+
+    // 5. Hero Bio
+    if (c.bioText) {
+        html = html.replace(/(<section class="hero">[\s\S]*?<\/h1>\s*)<p>[\s\S]*?<\/p>/i, `$1<p>${escapeHtml(c.bioText)}</p>`);
+    }
+
+    // 6. Hero CTA Button
+    if (c.heroCtaText) {
+        html = html.replace(/(<a\s+[^>]*?class="cta-button"[^>]*?>)[\s\S]*?(<\/a>)/i, `$1${escapeHtml(c.heroCtaText)}$2`);
+    }
+
+    // 7. Social Proof Badge
+    if (c.socialProofText) {
+        html = html.replace(/(<div class="social-proof">)[\s\S]*?(<\/div>)/i, `$1${escapeHtml(c.socialProofText)}$2`);
+    }
+
+    // 8. Plans Section H2 & Subheading
+    const plansHeading = c.plansHeading || 'Choose Your Reading';
+    const plansSubheadingHtml = c.plansSubheading 
+        ? `<p class="plans-subheading" style="color: var(--text-muted); font-size: 0.95rem; margin-top: -6px; margin-bottom: 25px;">${escapeHtml(c.plansSubheading)}</p>` 
+        : '';
+
+    html = html.replace(/(<section id="plans" class="plans-section">\s*)<h2>[\s\S]*?<\/h2>(\s*<p class="plans-subheading"[\s\S]*?<\/p>)?/i,
+        `$1<h2>${escapeHtml(plansHeading)}</h2>\n        ${plansSubheadingHtml}`);
+
+    // 9. Plans Container Cards
+    if (plans.length > 0) {
+        const cardsHtml = plans.map((plan, index) => {
+            const isPopular = index === 1;
+            const planDuration = plan.duration || '30';
+            return `            <!-- Plan ${index + 1} -->
+            <div class="plan-card ${isPopular ? 'popular' : ''}" data-plan-index="${index}">
+                ${isPopular ? '<div class="badge">Most Popular</div>' : ''}
+                <div class="plan-header">
+                    <h3 class="plan-title">${escapeHtml(plan.name)}</h3>
+                    <p class="plan-desc">${escapeHtml(plan.desc)}</p>
+                </div>
+                <div class="plan-divider"></div>
+                <div class="plan-footer">
+                    <div class="plan-duration">⏱️ ${planDuration} Mins Session</div>
+                    <button class="plan-btn" onclick="window.location.href='booking.html?plan=${index}'">Book Now • ₹${plan.price}</button>
+                </div>
+            </div>`;
+        }).join('\n');
+
+        html = html.replace(/(<div class="plans-container">)[\s\S]*?(<\/div>\s*<\/section>)/i,
+            `$1\n${cardsHtml}\n        $2`);
+    }
+
+    // 10. Testimonials
+    if (c.testimonialsTitle) {
+        html = html.replace(/(<section class="testimonials">\s*)<h2>[\s\S]*?<\/h2>/i,
+            `$1<h2>${escapeHtml(c.testimonialsTitle)}</h2>`);
+    }
+    if (c.reviews && c.reviews.length > 0) {
+        const reviewsHtml = c.reviews.map(r => `            <div class="testimonial-card">
+                <div class="stars">★★★★★</div>
+                <p class="quote">"${escapeHtml(r.quote)}"</p>
+                <p class="author">${escapeHtml(r.author)}</p>
+            </div>`).join('\n');
+
+        html = html.replace(/(<div class="testimonial-container">)[\s\S]*?(<\/div>\s*<\/section>)/i,
+            `$1\n${reviewsHtml}\n        $2`);
+    }
+
+    // 11. Footer Copyright
+    if (c.footerCopyright) {
+        html = html.replace(/(<footer>\s*<p>)[\s\S]*?(<\/p>\s*<\/footer>)/i,
+            `$1${escapeHtml(c.footerCopyright)}$2`);
+    }
+
+    // 12. Preloaded Config Script in <head>
+    const safeJson = JSON.stringify(safeConfig).replace(/<\/script>/gi, '<\\/script>');
+    const scriptTag = `<script id="__PRELOADED_CONFIG_SCRIPT__">window.__PRELOADED_CONFIG__ = ${safeJson};</script>`;
+    if (html.includes('id="__PRELOADED_CONFIG_SCRIPT__"')) {
+        html = html.replace(/<script id="__PRELOADED_CONFIG_SCRIPT__">[\s\S]*?<\/script>/i, scriptTag);
+    } else {
+        html = html.replace(/<\/head>/i, `    ${scriptTag}\n</head>`);
+    }
+
+    return html;
+}
+
+function renderBookingHtml(html, db, planQuery) {
+    const c = db.content || {};
+    const safeConfig = {
+        content: c,
+        plans: db.plans || [],
+        settings: db.settings || {},
+        unlistedPlan: db.unlistedPlan || null
+    };
+
+    let plan = null;
+    if (planQuery === 'unlisted' && db.unlistedPlan) {
+        plan = db.unlistedPlan;
+    } else if (db.plans && db.plans.length > 0) {
+        const pIdx = parseInt(planQuery) || 0;
+        plan = db.plans[pIdx] || db.plans[0];
+    }
+
+    if (plan) {
+        const pPrice = parseInt(plan.price) || 999;
+        const pOld = plan.originalPrice ? parseInt(plan.originalPrice) : Math.round(pPrice * 1.5);
+        html = html.replace(/(<div class="b-plan-name" id="selected-plan-name">)[\s\S]*?(<\/div>)/i, `$1${escapeHtml(plan.name)}$2`);
+        html = html.replace(/(<span class="old-price" id="header-old-price">)[\s\S]*?(<\/span>)/i, `$1₹${pOld}$2`);
+        html = html.replace(/(<span class="current-price" id="header-cur-price">)[\s\S]*?(<\/span>)/i, `$1₹${pPrice}$2`);
+    }
+
+    if (c.siteName) {
+        html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>Select Timing | ${escapeHtml(c.siteName)}</title>`);
+    }
+
+    const safeJson = JSON.stringify(safeConfig).replace(/<\/script>/gi, '<\\/script>');
+    const scriptTag = `<script id="__PRELOADED_CONFIG_SCRIPT__">window.__PRELOADED_CONFIG__ = ${safeJson};</script>`;
+    if (html.includes('id="__PRELOADED_CONFIG_SCRIPT__"')) {
+        html = html.replace(/<script id="__PRELOADED_CONFIG_SCRIPT__">[\s\S]*?<\/script>/i, scriptTag);
+    } else {
+        html = html.replace(/<\/head>/i, `    ${scriptTag}\n</head>`);
+    }
+
+    return html;
+}
+
+function renderOfferHtml(html, db) {
+    const c = db.content || {};
+    const p = db.unlistedPlan || {};
+    const safeConfig = {
+        content: c,
+        plans: db.plans || [],
+        settings: db.settings || {},
+        unlistedPlan: p
+    };
+
+    if (c.siteName) {
+        html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(c.siteName)} | Exclusive Offer</title>`);
+        html = html.replace(/<div class="logo">[\s\S]*?<\/div>/i, `<div class="logo">${escapeHtml(c.siteName)}</div>`);
+    }
+    if (c.profilePic) {
+        let pic = c.profilePic;
+        if (pic.includes('localhost') || pic.includes('127.0.0.1')) {
+            pic = pic.replace(/^https?:\/\/[^\/]+\/?/, '');
+            if (!pic) pic = 'profile.jpg';
+        }
+        html = html.replace(/(<img\s+[^>]*?class="profile-pic"[^>]*?>)/i, (match) => {
+            let replaced = match.replace(/src="[^"]*"/i, `src="${pic}"`);
+            if (c.readerName) replaced = replaced.replace(/alt="[^"]*"/i, `alt="${escapeHtml(c.readerName)}"`);
+            return replaced;
+        });
+    }
+    if (c.headerText) {
+        html = html.replace(/(<section class="hero">[\s\S]*?)<h1>[\s\S]*?<\/h1>/i, `$1<h1>${c.headerText}</h1>`);
+    }
+    if (c.bioText) {
+        html = html.replace(/(<section class="hero">[\s\S]*?<\/h1>\s*)<p>[\s\S]*?<\/p>/i, `$1<p>${escapeHtml(c.bioText)}</p>`);
+    }
+    if (c.socialProofText) {
+        html = html.replace(/(<div class="social-proof">)[\s\S]*?(<\/div>)/i, `$1${escapeHtml(c.socialProofText)}$2`);
+    }
+
+    // Unlisted Plan fields
+    if (p.name) html = html.replace(/(<h3 id="offer-plan-name">)[\s\S]*?(<\/h3>)/i, `$1${escapeHtml(p.name)}$2`);
+    if (p.badge) html = html.replace(/(<span class="offer-badge" id="offer-badge-text">)[\s\S]*?(<\/span>)/i, `$1${escapeHtml(p.badge)}$2`);
+    if (p.desc) html = html.replace(/(<p class="single-plan-desc" id="offer-plan-desc">)[\s\S]*?(<\/p>)/i, `$1${escapeHtml(p.desc)}$2`);
+    if (p.price) {
+        html = html.replace(/(<span class="price-current" id="offer-plan-price">)[\s\S]*?(<\/span>)/i, `$1₹${p.price}$2`);
+        html = html.replace(/(<button class="btn-claim-plan" id="main-offer-btn"[^>]*?>)[\s\S]*?(<\/button>)/i, `$1Book Exclusive Session • ₹${p.price}$2`);
+    }
+    if (p.originalPrice) {
+        html = html.replace(/(<span class="price-original" id="offer-plan-orig-price">)[\s\S]*?(<\/span>)/i, `$1₹${p.originalPrice}$2`);
+        if (p.price) {
+            const savingsPercent = Math.round((1 - (parseInt(p.price) / parseInt(p.originalPrice))) * 100);
+            html = html.replace(/(<span class="save-tag" id="offer-save-tag">)[\s\S]*?(<\/span>)/i, `$1Save ${savingsPercent}%$2`);
+        }
+    }
+    if (p.duration) {
+        html = html.replace(/(<span id="offer-plan-duration">)[\s\S]*?(<\/span>)/i, `$1${p.duration} Mins Session$2`);
+    }
+    if (p.features && p.features.length > 0) {
+        const featHtml = p.features.map(f => `<li><i class="fa-solid fa-circle-check"></i> <span>${escapeHtml(f)}</span></li>`).join('\n                    ');
+        html = html.replace(/(<ul class="features-list" id="offer-features-list">)[\s\S]*?(<\/ul>)/i, `$1\n                    ${featHtml}\n                $2`);
+    }
+
+    if (c.footerCopyright) {
+        html = html.replace(/(<footer>\s*<p>)[\s\S]*?(<\/p>\s*<\/footer>)/i, `$1${escapeHtml(c.footerCopyright)}$2`);
+    }
+
+    const safeJson = JSON.stringify(safeConfig).replace(/<\/script>/gi, '<\\/script>');
+    const scriptTag = `<script id="__PRELOADED_CONFIG_SCRIPT__">window.__PRELOADED_CONFIG__ = ${safeJson};</script>`;
+    if (html.includes('id="__PRELOADED_CONFIG_SCRIPT__"')) {
+        html = html.replace(/<script id="__PRELOADED_CONFIG_SCRIPT__">[\s\S]*?<\/script>/i, scriptTag);
+    } else {
+        html = html.replace(/<\/head>/i, `    ${scriptTag}\n</head>`);
+    }
+
+    return html;
+}
+
+// Synchronize static files on disk with latest DB content so raw files stay updated
+function syncPagesToDisk(db) {
+    try {
+        const indexPath = path.join(__dirname, 'index.html');
+        if (fs.existsSync(indexPath)) {
+            const rawIndex = fs.readFileSync(indexPath, 'utf8');
+            const renderedIndex = renderIndexHtml(rawIndex, db);
+            fs.writeFileSync(indexPath, renderedIndex, 'utf8');
+        }
+        const offerPath = path.join(__dirname, 'offer.html');
+        if (fs.existsSync(offerPath)) {
+            const rawOffer = fs.readFileSync(offerPath, 'utf8');
+            const renderedOffer = renderOfferHtml(rawOffer, db);
+            fs.writeFileSync(offerPath, renderedOffer, 'utf8');
+        }
+    } catch (e) {
+        console.error("syncPagesToDisk error:", e);
+    }
+}
+
+// Dynamic pre-rendered public routes (Zero Flash of Default Content)
+app.get(['/', '/index.html'], (req, res) => {
+    const db = getDB();
+    const indexPath = path.join(__dirname, 'index.html');
+    fs.readFile(indexPath, 'utf8', (err, html) => {
+        if (err) return res.status(500).send("Error loading landing page");
+        const rendered = renderIndexHtml(html, db);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.send(rendered);
+    });
+});
+
+app.get('/booking.html', (req, res) => {
+    const db = getDB();
+    const bookingPath = path.join(__dirname, 'booking.html');
+    fs.readFile(bookingPath, 'utf8', (err, html) => {
+        if (err) return res.status(500).send("Error loading booking page");
+        const rendered = renderBookingHtml(html, db, req.query.plan);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.send(rendered);
+    });
+});
+
+app.get('/offer.html', (req, res) => {
+    const db = getDB();
+    const offerPath = path.join(__dirname, 'offer.html');
+    fs.readFile(offerPath, 'utf8', (err, html) => {
+        if (err) return res.status(500).send("Error loading offer page");
+        const rendered = renderOfferHtml(html, db);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.send(rendered);
+    });
+});
+
 // Serve the frontend static files (HTML, CSS, images, JS) directly from this directory
 app.use(express.static(__dirname));
 
@@ -329,6 +634,14 @@ app.post('/api/config', requireAdminAuth, (req, res) => {
     }
     
     saveDB(currentDB);
+    
+    // Automatically synchronize index.html and offer.html on disk with the new config
+    try {
+        syncPagesToDisk(currentDB);
+    } catch (syncErr) {
+        console.error("Failed to sync pages to disk:", syncErr);
+    }
+
     res.json({ success: true, message: 'Configuration saved successfully.' });
 });
 

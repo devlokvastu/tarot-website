@@ -8,6 +8,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="booking.css?v=37">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        (function() {
+            try {
+                if (window.__PRELOADED_CONFIG__) {
+                    localStorage.setItem('trikaldarshi_config', JSON.stringify(window.__PRELOADED_CONFIG__));
+                } else {
+                    var cached = localStorage.getItem('trikaldarshi_config');
+                    if (cached) {
+                        window.__PRELOADED_CONFIG__ = JSON.parse(cached);
+                    }
+                }
+            } catch(e) {}
+        })();
+    </script>
     <style>
         .client-input.input-error {
             border: 1.5px solid #ef4444 !important;
@@ -155,35 +169,50 @@
         const planId = urlParams.get('plan') || '0';
 
         // Load Plan Header dynamically
+        function applyPlanHeader(db) {
+            if (!db) return;
+            window.siteConfig = db;
+            let plan = null;
+            if (planId === 'unlisted' && db.unlistedPlan) {
+                plan = db.unlistedPlan;
+            } else if (db.plans && db.plans.length > 0) {
+                const pIdx = parseInt(planId) || 0;
+                plan = db.plans[pIdx] || db.plans[0];
+            }
+            window.currentPlan = plan;
+            
+            if (plan) {
+                const pPrice = parseInt(plan.price) || 999;
+                const pOld = plan.originalPrice ? parseInt(plan.originalPrice) : Math.round(pPrice * 1.5);
+                
+                const curPriceEl = document.getElementById('header-cur-price');
+                const oldPriceEl = document.getElementById('header-old-price');
+                const planNameEl = document.getElementById('selected-plan-name');
+                
+                if (curPriceEl) curPriceEl.innerText = `₹${pPrice}`;
+                if (oldPriceEl) oldPriceEl.innerText = `₹${pOld}`;
+                if (planNameEl) planNameEl.innerText = plan.name;
+            }
+            if (db.content && db.content.siteName) {
+                document.title = `Select Timing | ${db.content.siteName}`;
+            }
+        }
+
+        // Apply immediately from preloaded or cached data (0ms delay)
+        const cachedOrPreloaded = window.__PRELOADED_CONFIG__ || (() => {
+            try { return JSON.parse(localStorage.getItem('trikaldarshi_config')); } catch(e){ return null; }
+        })();
+        if (cachedOrPreloaded) {
+            applyPlanHeader(cachedOrPreloaded);
+        }
+
         async function loadPlanHeader() {
             try {
                 const res = await fetch('/api/config');
                 const db = await res.json();
-                window.siteConfig = db;
-                let plan = null;
-                if (planId === 'unlisted' && db.unlistedPlan) {
-                    plan = db.unlistedPlan;
-                } else if (db.plans && db.plans.length > 0) {
-                    const pIdx = parseInt(planId) || 0;
-                    plan = db.plans[pIdx] || db.plans[0];
-                }
-                window.currentPlan = plan;
-                
-                if (plan) {
-                    const pPrice = parseInt(plan.price) || 999;
-                    const pOld = plan.originalPrice ? parseInt(plan.originalPrice) : Math.round(pPrice * 1.5);
-                    
-                    const curPriceEl = document.getElementById('header-cur-price');
-                    const oldPriceEl = document.getElementById('header-old-price');
-                    const planNameEl = document.getElementById('selected-plan-name');
-                    
-                    if (curPriceEl) curPriceEl.innerText = `₹${pPrice}`;
-                    if (oldPriceEl) oldPriceEl.innerText = `₹${pOld}`;
-                    if (planNameEl) planNameEl.innerText = plan.name;
-                }
-                if (db.content && db.content.siteName) {
-                    document.title = `Select Timing | ${db.content.siteName}`;
-                }
+                window.__PRELOADED_CONFIG__ = db;
+                try { localStorage.setItem('trikaldarshi_config', JSON.stringify(db)); } catch(e){}
+                applyPlanHeader(db);
             } catch(e) {
                 console.error("Failed to load plan header", e);
             }
