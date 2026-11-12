@@ -1,5 +1,13 @@
 document.addEventListener("DOMContentLoaded", async () => {
     
+    // --- 0. Immediate 0ms Hydration from Preloaded Config or Cache ---
+    try {
+        const initialConfig = window.__PRELOADED_CONFIG__ || JSON.parse(localStorage.getItem('trikaldarshi_config') || 'null');
+        if (initialConfig && typeof populateConfigData === 'function') {
+            populateConfigData(initialConfig);
+        }
+    } catch(e) {}
+
     // --- 0. Admin Authentication Guard ---
     try {
         const authRes = await fetch('/api/auth/check');
@@ -106,16 +114,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // --- 4. REAL BACKEND INTEGRATION ---
+    // --- 4. REAL BACKEND INTEGRATION & INSTANT HYDRATION ---
     
-    // Load existing data on boot
-    async function loadConfig() {
+    function populateConfigData(data) {
+        if (!data) return;
         try {
-            const res = await fetch('/api/config');
-            const data = await res.json();
-            
             // Populate Settings
-            if(data.settings) {
+            if (data.settings) {
                 const coolSetting = document.getElementById('setting-cooling');
                 if (coolSetting) coolSetting.value = data.settings.cooling || 15;
             }
@@ -175,7 +180,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             
             // Populate Availability
-            if(data.availability) {
+            if (data.availability) {
                 const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
                 days.forEach(day => {
                     const config = data.availability[day];
@@ -194,8 +199,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
             }
 
-
-
             // Populate Plans
             if (data.plans) {
                 const planCards = document.querySelectorAll('.plan-edit-card');
@@ -207,11 +210,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const durationInput = planCards[index].querySelector('input[name="plan_duration"]');
                         const featuresInput = planCards[index].querySelector('textarea[name="plan_features"]');
                         
-                        if (nameInput) nameInput.value = plan.name;
-                        if (priceInput) priceInput.value = plan.price;
-                        if (descInput) descInput.value = plan.desc;
+                        if (nameInput) nameInput.value = plan.name || '';
+                        if (priceInput) priceInput.value = plan.price || '';
+                        if (descInput) descInput.value = plan.desc || '';
                         if (durationInput) durationInput.value = plan.duration || "30";
-                        if (featuresInput) featuresInput.value = plan.features.join('\n');
+                        if (featuresInput && plan.features) {
+                            featuresInput.value = Array.isArray(plan.features) ? plan.features.join('\n') : plan.features;
+                        }
                     }
                 });
             }
@@ -251,10 +256,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Populate Blocked Dates
             if (data.blockedDates) {
                 window.globalBlockedDates = data.blockedDates;
-                renderBlockedDates();
-            } else {
-                window.globalBlockedDates = [];
-                renderBlockedDates();
+                if (typeof renderBlockedDates === 'function') renderBlockedDates();
             }
 
             // Populate Integrations
@@ -264,7 +266,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (webhookInput) webhookInput.value = data.integrations.googleSheetsUrl;
                 }
 
-                // Populate Razorpay API credentials
                 window._savedRzpKeyId = data.integrations.razorpayKeyId || '';
                 window._savedRzpKeySecret = data.integrations.razorpayKeySecret || '';
 
@@ -295,7 +296,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (editorEl) editorEl.value = customCode;
                 }
             }
+        } catch (err) {
+            console.error("Error populating config data:", err);
+        }
+    }
 
+    // Load existing data on boot
+    async function loadConfig() {
+        try {
+            const res = await fetch('/api/config');
+            if (res.ok) {
+                const data = await res.json();
+                try {
+                    localStorage.setItem('trikaldarshi_config', JSON.stringify(data));
+                } catch(e) {}
+                populateConfigData(data);
+            }
         } catch (e) {
             console.error("Could not load backend configuration", e);
         }
@@ -1120,6 +1136,7 @@ window.loadBookings = async function() {
             let statusKey = b.status || 'Upcoming';
             let col = document.getElementById('col-' + statusKey);
             if (!col && statusKey === 'Done') col = document.getElementById('col-Completed'); // Fallback
+            if (!col && (statusKey === 'Follow-Up' || statusKey === 'FollowUp' || statusKey === 'followup')) col = document.getElementById('col-FollowUp');
             if (!col) col = document.getElementById('col-Upcoming');
             
             if (col) {
@@ -1876,6 +1893,7 @@ window.changeModalStatus = function(newStatus) {
     // 2. Identify destination Kanban column
     let targetColId = 'col-' + newStatus;
     if (newStatus === 'Done') targetColId = 'col-Completed';
+    if (newStatus === 'Follow-Up' || newStatus === 'FollowUp' || newStatus === 'followup') targetColId = 'col-FollowUp';
     const targetCol = document.getElementById(targetColId);
 
     // Locate the card in the board
@@ -1984,6 +2002,255 @@ window.deleteCurrentBooking = async function() {
     }
 };
 
+// ===== CRM FOLLOW-UP SCHEDULING CONTROLLER =====
+window.selectedFollowUpDays = 7;
+
+window.openFollowUpModal = function() {
+    if (!currentModalBookingId || !window.bookingsData) return;
+    const booking = window.bookingsData.find(b => b.id === currentModalBookingId);
+    if (!booking) return;
+
+    // Fill client info
+    const nameEl = document.getElementById('fu-client-name');
+    const idEl = document.getElementById('fu-client-id');
+    const noteEl = document.getElementById('fu-note-input');
+    const timeInput = document.getElementById('fu-preview-time');
+
+    if (nameEl) nameEl.innerText = booking.name || 'Client';
+    if (idEl) idEl.innerText = booking.id;
+    if (noteEl) noteEl.value = booking.followUpNote || '';
+    if (timeInput) delete timeInput.dataset.userEdited;
+
+    // Default to 7 days (or existing followUpDays if previously set)
+    const initialDays = booking.followUpDays ? parseInt(booking.followUpDays) : 7;
+    window.selectedFollowUpDays = initialDays;
+
+    // Highlight the matching button (5, 7, 15) or custom
+    let matchedPreset = false;
+    document.querySelectorAll('.fu-btn-day').forEach(btn => {
+        const d = btn.getAttribute('data-days');
+        const isMatch = (d === String(initialDays));
+        btn.classList.toggle('active', isMatch);
+        if (isMatch) matchedPreset = true;
+    });
+
+    const customBox = document.getElementById('fu-custom-container');
+    const customInput = document.getElementById('fu-custom-days-input');
+    if (!matchedPreset) {
+        const customBtn = document.querySelector('.fu-btn-day[data-days="custom"]');
+        if (customBtn) customBtn.classList.add('active');
+        if (customBox) customBox.classList.remove('hidden');
+        if (customInput) customInput.value = initialDays;
+    } else {
+        if (customBox) customBox.classList.add('hidden');
+    }
+
+    // Live calculate date & time preview
+    updateFollowUpPreview();
+
+    // Reveal Follow-Up modal
+    const overlay = document.getElementById('followup-modal-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+};
+
+window.closeFollowUpModal = function(event) {
+    if (event && event.target && event.target.id !== 'followup-modal-overlay') return;
+    const overlay = document.getElementById('followup-modal-overlay');
+    if (overlay) overlay.classList.add('hidden');
+};
+
+window.setFollowUpDays = function(days) {
+    window.selectedFollowUpDays = parseInt(days) || 7;
+    document.querySelectorAll('.fu-btn-day').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-days') === String(days));
+    });
+    const customBox = document.getElementById('fu-custom-container');
+    if (customBox) customBox.classList.add('hidden');
+    updateFollowUpPreview();
+};
+
+window.toggleCustomDays = function() {
+    const customBox = document.getElementById('fu-custom-container');
+    const customInput = document.getElementById('fu-custom-days-input');
+    document.querySelectorAll('.fu-btn-day').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-days') === 'custom');
+    });
+    if (customBox) {
+        customBox.classList.remove('hidden');
+        if (customInput) {
+            customInput.focus();
+            window.selectedFollowUpDays = parseInt(customInput.value) || 10;
+        }
+    }
+    updateFollowUpPreview();
+};
+
+window.onCustomDaysInput = function(val) {
+    const num = parseInt(val);
+    if (!isNaN(num) && num > 0) {
+        window.selectedFollowUpDays = num;
+        updateFollowUpPreview();
+    }
+};
+
+window.updateFollowUpPreviewDateString = function() {
+    const timeInput = document.getElementById('fu-preview-time');
+    if (timeInput) timeInput.dataset.userEdited = 'true';
+};
+
+window.updateFollowUpPreview = function() {
+    if (!currentModalBookingId || !window.bookingsData) return;
+    const booking = window.bookingsData.find(b => b.id === currentModalBookingId);
+
+    let baseDate = new Date();
+    let baseTimeStr = '03:00 PM';
+
+    if (booking && booking.dateTimeStr) {
+        const timeMatch = booking.dateTimeStr.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))/i);
+        if (timeMatch) baseTimeStr = timeMatch[1].toUpperCase();
+
+        const parsedMs = (typeof parseBookingDateTime === 'function') 
+            ? parseBookingDateTime(booking.dateTimeStr, booking.createdAt) 
+            : 0;
+        if (parsedMs > 0) {
+            const parsedDate = new Date(parsedMs);
+            if (parsedDate.getTime() > Date.now() - (24 * 3600 * 1000)) {
+                baseDate = parsedDate;
+            }
+        }
+    }
+
+    const daysToAdd = window.selectedFollowUpDays || 7;
+    const targetDate = new Date(baseDate.getTime() + (daysToAdd * 24 * 3600 * 1000));
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const dayName = dayNames[targetDate.getDay()];
+    const monthName = monthNames[targetDate.getMonth()];
+    const dateNum = targetDate.getDate();
+    const yearNum = targetDate.getFullYear();
+
+    const datePreviewEl = document.getElementById('fu-preview-date');
+    const relTagEl = document.getElementById('fu-preview-rel');
+    const timeInput = document.getElementById('fu-preview-time');
+
+    if (datePreviewEl) {
+        datePreviewEl.innerText = `${dayName}, ${dateNum} ${monthName} ${yearNum}`;
+    }
+    if (relTagEl) {
+        relTagEl.innerText = (daysToAdd === 1) ? 'In 1 Day' : `In ${daysToAdd} Days`;
+    }
+    if (timeInput && !timeInput.dataset.userEdited) {
+        timeInput.value = baseTimeStr;
+    }
+};
+
+window.confirmFollowUpSession = async function() {
+    if (!currentModalBookingId || !window.bookingsData) return;
+    const bookingId = currentModalBookingId;
+    const booking = window.bookingsData.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    // 1. Calculate final Follow-Up dateTimeStr
+    const daysToAdd = window.selectedFollowUpDays || 7;
+    const timeInput = document.getElementById('fu-preview-time');
+    let timeStr = (timeInput && timeInput.value.trim()) ? timeInput.value.trim() : '03:00 PM';
+
+    let baseDate = new Date();
+    if (booking.dateTimeStr) {
+        const parsedMs = (typeof parseBookingDateTime === 'function')
+            ? parseBookingDateTime(booking.dateTimeStr, booking.createdAt)
+            : 0;
+        if (parsedMs > 0) {
+            const parsedDate = new Date(parsedMs);
+            if (parsedDate.getTime() > Date.now() - (24 * 3600 * 1000)) {
+                baseDate = parsedDate;
+            }
+        }
+    }
+
+    const targetDate = new Date(baseDate.getTime() + (daysToAdd * 24 * 3600 * 1000));
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const dayName = dayNames[targetDate.getDay()];
+    const monthName = monthNames[targetDate.getMonth()];
+    const dateNum = targetDate.getDate();
+
+    // Standard format matching CRM cards: e.g. "03:00 PM, Mon, 19 Oct"
+    const newDateTimeStr = `${timeStr}, ${dayName}, ${dateNum} ${monthName}`;
+    const noteEl = document.getElementById('fu-note-input');
+    const note = noteEl ? noteEl.value.trim() : '';
+
+    // 2. Update local in-memory dataset
+    booking.status = 'Follow-Up';
+    booking.dateTimeStr = newDateTimeStr;
+    booking.followUpDays = daysToAdd;
+    if (note) booking.followUpNote = note;
+
+    // 3. Close both modals
+    const fuModal = document.getElementById('followup-modal-overlay');
+    if (fuModal) fuModal.classList.add('hidden');
+    const bookingModal = document.getElementById('booking-modal-overlay');
+    if (bookingModal) bookingModal.classList.add('hidden');
+    clearInterval(countdownInterval);
+    isTimerRunning = false;
+
+    // 4. Update card in DOM and shift into Follow-Up column
+    const card = document.getElementById(bookingId);
+    const targetCol = document.getElementById('col-FollowUp');
+
+    if (card && targetCol) {
+        // Step 4a: Shrink/lift out of previous column
+        card.classList.add('card-shifting-out');
+
+        setTimeout(() => {
+            card.classList.remove('card-shifting-out');
+
+            // Step 4b: Update displayed time on card
+            const timeEl = card.querySelector('.card-time');
+            if (timeEl) {
+                timeEl.innerHTML = `<i class="fa-regular fa-clock"></i> ${newDateTimeStr}`;
+            }
+
+            // Step 4c: Prepend card into Follow-Up column
+            targetCol.prepend(card);
+            card.setAttribute('data-glow-status', 'Follow-Up');
+            card.classList.add('card-shifted-in');
+
+            // Step 4d: Update column headers
+            if (typeof updateColumnCounts === 'function') {
+                updateColumnCounts();
+            }
+
+            // Step 4e: Scroll smoothly to card
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Step 4f: Clear animation glow
+            setTimeout(() => {
+                card.classList.remove('card-shifted-in');
+                card.removeAttribute('data-glow-status');
+            }, 2200);
+        }, 180);
+    }
+
+    // 5. Background sync to Server & Google Sheets Webhook
+    try {
+        await fetch(`/api/bookings/${bookingId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                status: 'Follow-Up',
+                dateTimeStr: newDateTimeStr,
+                followUpDays: daysToAdd,
+                followUpNote: note
+            })
+        });
+    } catch (e) {
+        console.error("Failed to save follow-up status to server:", e);
+    }
+};
+
 // ===== GOOGLE APPS SCRIPT CODE MODAL CONTROLLER =====
 window.GOOGLE_APPS_SCRIPT_CODE = `function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
@@ -2073,6 +2340,9 @@ function doPost(e) {
         var statusCell = sheet.getRange(foundRow, 10);
         statusCell.setValue(data.status);
         formatStatusCell(statusCell, data.status);
+        if (data.dateTimeStr) {
+          sheet.getRange(foundRow, 7).setValue(data.dateTimeStr);
+        }
         
         return ContentService.createTextOutput(JSON.stringify({ status: "updated", row: foundRow })).setMimeType(ContentService.MimeType.JSON);
       } else {
@@ -2160,6 +2430,8 @@ function formatStatusCell(cell, status) {
     cell.setBackground('#fee2e2').setFontColor('#991b1b'); // Light Red / Dark Red text
   } else if (st === 'rescheduled' || st === 'reschedule') {
     cell.setBackground('#fef3c7').setFontColor('#92400e'); // Light Yellow / Dark Amber text
+  } else if (st === 'follow-up' || st === 'followup' || st === 'follow up') {
+    cell.setBackground('#f3e8ff').setFontColor('#6b21a8'); // Purple badge
   } else if (st === 'reset link') {
     cell.setBackground('#7e22ce').setFontColor('#ffffff'); // Purple badge
   }
@@ -2210,6 +2482,14 @@ function ensureConditionalFormatting(sheet) {
     .whenTextEqualTo("Rescheduled")
     .setBackground("#fef3c7")
     .setFontColor("#92400e")
+    .setRanges([statusRange])
+    .build());
+
+  // Follow-Up - Purple
+  newRules.push(SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("Follow-Up")
+    .setBackground("#f3e8ff")
+    .setFontColor("#6b21a8")
     .setRanges([statusRange])
     .build());
     

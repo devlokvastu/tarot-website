@@ -135,7 +135,15 @@ app.get(['/admin.html', '/admin'], (req, res, next) => {
     if (!isValidSession(req)) {
         return res.redirect('/login.html');
     }
-    res.sendFile(path.join(__dirname, 'admin.html'));
+    const db = getDB();
+    const adminPath = path.join(__dirname, 'admin.html');
+    fs.readFile(adminPath, 'utf8', (err, html) => {
+        if (err) return res.status(500).send("Error loading admin dashboard");
+        const rendered = renderAdminHtml(html, db);
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.send(rendered);
+    });
 });
 
 // If user is already authenticated and visits /login.html, redirect directly to /admin.html
@@ -394,6 +402,185 @@ function renderOfferHtml(html, db) {
     return html;
 }
 
+function renderAdminHtml(html, db) {
+    const c = db.content || {};
+    const plans = db.plans || [];
+    const u = db.unlistedPlan || {};
+    const settings = db.settings || {};
+
+    const safeConfig = {
+        content: c,
+        plans: plans,
+        settings: settings,
+        unlistedPlan: u,
+        availability: db.availability || {},
+        blockedDates: db.blockedDates || [],
+        integrations: db.integrations || {}
+    };
+
+    if (c.siteName) {
+        html = html.replace(/<p id="sidebar-site-name">[\s\S]*?<\/p>/i, `<p id="sidebar-site-name">${escapeHtml(c.siteName)} CMS</p>`);
+    }
+    if (c.readerName) {
+        html = html.replace(/<h2 id="sidebar-reader-name">[\s\S]*?<\/h2>/i, `<h2 id="sidebar-reader-name">${escapeHtml(c.readerName)}</h2>`);
+    }
+
+    if (settings.cooling !== undefined) {
+        html = html.replace(/(<input[^>]*id="setting-cooling"[^>]*?value=")[^"]*(")/i, `$1${settings.cooling}$2`);
+    }
+
+    if (c.siteName) {
+        html = html.replace(/(<input[^>]*id="content-site-name"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.siteName)}$2`);
+    }
+    if (c.readerName) {
+        html = html.replace(/(<input[^>]*id="content-reader-name"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.readerName)}$2`);
+    }
+    if (c.themeColor) {
+        html = html.replace(/(<input[^>]*id="admin-theme-color"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.themeColor)}$2`);
+    }
+    if (c.profilePic) {
+        let pic = c.profilePic;
+        if (pic.includes('localhost') || pic.includes('127.0.0.1')) {
+            pic = pic.replace(/^https?:\/\/[^\/]+\/?/, '');
+            if (!pic) pic = 'profile.jpg';
+        }
+        html = html.replace(/(<img\s+[^>]*?id="profile-preview"[^>]*?src=")[^"]*(")/i, `$1${pic}$2`);
+    }
+
+    if (c.headerText) {
+        html = html.replace(/(<input[^>]*id="header-text"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.headerText)}$2`);
+    }
+    if (c.bioText) {
+        html = html.replace(/(<textarea[^>]*id="bio-text"[^>]*?>)[\s\S]*?(<\/textarea>)/i, `$1${escapeHtml(c.bioText)}$2`);
+    }
+    if (c.heroCtaText) {
+        html = html.replace(/(<input[^>]*id="content-hero-cta"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.heroCtaText)}$2`);
+    }
+    if (c.socialProofText) {
+        html = html.replace(/(<input[^>]*id="content-social-proof"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.socialProofText)}$2`);
+    }
+
+    if (c.plansHeading) {
+        html = html.replace(/(<input[^>]*id="content-plans-heading"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.plansHeading)}$2`);
+    }
+    if (c.plansSubheading) {
+        html = html.replace(/(<input[^>]*id="content-plans-subheading"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.plansSubheading)}$2`);
+    }
+
+    if (c.bookingHeadline) {
+        html = html.replace(/(<input[^>]*id="content-booking-headline"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.bookingHeadline)}$2`);
+    }
+    if (c.bookingSubtitle) {
+        html = html.replace(/(<input[^>]*id="content-booking-subtitle"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.bookingSubtitle)}$2`);
+    }
+    if (c.bookingTrustBanner) {
+        html = html.replace(/(<input[^>]*id="content-booking-trust"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.bookingTrustBanner)}$2`);
+    }
+
+    if (c.testimonialsTitle) {
+        html = html.replace(/(<input[^>]*id="content-testimonials-title"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.testimonialsTitle)}$2`);
+    }
+    if (c.reviews && c.reviews.length >= 3) {
+        html = html.replace(/(<textarea[^>]*id="content-review1-quote"[^>]*?>)[\s\S]*?(<\/textarea>)/i, `$1${escapeHtml(c.reviews[0].quote || '')}$2`);
+        html = html.replace(/(<input[^>]*id="content-review1-author"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.reviews[0].author || '')}$2`);
+        html = html.replace(/(<textarea[^>]*id="content-review2-quote"[^>]*?>)[\s\S]*?(<\/textarea>)/i, `$1${escapeHtml(c.reviews[1].quote || '')}$2`);
+        html = html.replace(/(<input[^>]*id="content-review2-author"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.reviews[1].author || '')}$2`);
+        html = html.replace(/(<textarea[^>]*id="content-review3-quote"[^>]*?>)[\s\S]*?(<\/textarea>)/i, `$1${escapeHtml(c.reviews[2].quote || '')}$2`);
+        html = html.replace(/(<input[^>]*id="content-review3-author"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.reviews[2].author || '')}$2`);
+    }
+
+    if (c.footerCopyright) {
+        html = html.replace(/(<input[^>]*id="content-footer-copyright"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(c.footerCopyright)}$2`);
+    }
+
+    if (plans.length > 0) {
+        const subtitles = ['Plan 1 (Base)', 'Plan 2 (Popular)', 'Plan 3', 'Plan 4 (Premium)'];
+        const plansGridHtml = plans.map((plan, index) => {
+            const sub = subtitles[index] || `Plan ${index + 1}`;
+            const featuresStr = escapeHtml((plan.features || []).join('\n'));
+            return `                        <!-- Plan ${index + 1} -->
+                        <div class="card plan-edit-card">
+                            <h3>${sub}</h3>
+                            <div class="form-group">
+                                <label>Plan Name</label>
+                                <input type="text" class="form-control" name="plan_name" value="${escapeHtml(plan.name || '')}">
+                            </div>
+                            <div class="form-group">
+                                <label>Short Description</label>
+                                <input type="text" class="form-control" name="plan_desc" value="${escapeHtml(plan.desc || '')}">
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <div class="input-with-currency">
+                                    <span class="currency">₹</span>
+                                    <input type="number" class="form-control" name="plan_price" value="${escapeHtml(plan.price || '')}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (Minutes)</label>
+                                <input type="number" class="form-control" name="plan_duration" value="${escapeHtml(plan.duration || '30')}">
+                            </div>
+                            <div class="form-group">
+                                <label>Features (One per line)</label>
+                                <textarea class="form-control" name="plan_features" rows="4">${featuresStr}</textarea>
+                            </div>
+                        </div>`;
+        }).join('\n\n');
+
+        html = html.replace(/(<div class="plans-grid">)[\s\S]*?(<\/div>\s*<div class="panel-actions")/i, `$1\n${plansGridHtml}\n                    $2`);
+    }
+
+    if (u.name) {
+        html = html.replace(/(<input[^>]*id="unlisted-plan-name"[^>]*?)(placeholder="[^"]*")/i, (m, p1, p2) => `${p1}value="${escapeHtml(u.name)}" ${p2}`);
+    }
+    if (u.badge) {
+        html = html.replace(/(<input[^>]*id="unlisted-plan-badge"[^>]*?)(placeholder="[^"]*")/i, (m, p1, p2) => `${p1}value="${escapeHtml(u.badge)}" ${p2}`);
+    }
+    if (u.desc) {
+        html = html.replace(/(<input[^>]*id="unlisted-plan-desc"[^>]*?)(placeholder="[^"]*")/i, (m, p1, p2) => `${p1}value="${escapeHtml(u.desc)}" ${p2}`);
+    }
+    if (u.price) {
+        html = html.replace(/(<input[^>]*id="unlisted-plan-price"[^>]*?)(placeholder="[^"]*")/i, (m, p1, p2) => `${p1}value="${escapeHtml(u.price)}" ${p2}`);
+    }
+    if (u.originalPrice) {
+        html = html.replace(/(<input[^>]*id="unlisted-plan-orig-price"[^>]*?)(placeholder="[^"]*")/i, (m, p1, p2) => `${p1}value="${escapeHtml(u.originalPrice)}" ${p2}`);
+    }
+    if (u.duration) {
+        html = html.replace(/(<input[^>]*id="unlisted-plan-duration"[^>]*?)(placeholder="[^"]*")/i, (m, p1, p2) => `${p1}value="${escapeHtml(u.duration)}" ${p2}`);
+    }
+    if (u.features && u.features.length > 0) {
+        html = html.replace(/(<textarea[^>]*id="unlisted-plan-features"[^>]*?>)[\s\S]*?(<\/textarea>)/i, `$1${escapeHtml(u.features.join('\n'))}$2`);
+    }
+    if (u.timerMinutes) {
+        html = html.replace(/(<input[^>]*id="unlisted-timer-minutes"[^>]*?value=")[^"]*(")/i, `$1${u.timerMinutes}$2`);
+    }
+    if (u.timerBadge) {
+        html = html.replace(/(<input[^>]*id="unlisted-timer-badge"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(u.timerBadge)}$2`);
+    }
+    if (u.bullet1) {
+        html = html.replace(/(<input[^>]*id="unlisted-bullet-1"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(u.bullet1)}$2`);
+    }
+    if (u.bullet2) {
+        html = html.replace(/(<input[^>]*id="unlisted-bullet-2"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(u.bullet2)}$2`);
+    }
+    if (u.bullet3) {
+        html = html.replace(/(<input[^>]*id="unlisted-bullet-3"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(u.bullet3)}$2`);
+    }
+    if (u.ctaText) {
+        html = html.replace(/(<input[^>]*id="unlisted-cta-text"[^>]*?value=")[^"]*(")/i, `$1${escapeHtml(u.ctaText)}$2`);
+    }
+
+    const safeJson = JSON.stringify(safeConfig).replace(/<\/script>/gi, '<\\/script>');
+    const scriptTag = `<script id="__PRELOADED_CONFIG_SCRIPT__">window.__PRELOADED_CONFIG__ = ${safeJson};</script>`;
+    if (html.includes('id="__PRELOADED_CONFIG_SCRIPT__"')) {
+        html = html.replace(/<script id="__PRELOADED_CONFIG_SCRIPT__">[\s\S]*?<\/script>/i, scriptTag);
+    } else {
+        html = html.replace(/<\/head>/i, `    ${scriptTag}\n</head>`);
+    }
+
+    return html;
+}
+
 // Synchronize static files on disk with latest DB content so raw files stay updated
 function syncPagesToDisk(db) {
     try {
@@ -408,6 +595,12 @@ function syncPagesToDisk(db) {
             const rawOffer = fs.readFileSync(offerPath, 'utf8');
             const renderedOffer = renderOfferHtml(rawOffer, db);
             fs.writeFileSync(offerPath, renderedOffer, 'utf8');
+        }
+        const adminPath = path.join(__dirname, 'admin.html');
+        if (fs.existsSync(adminPath)) {
+            const rawAdmin = fs.readFileSync(adminPath, 'utf8');
+            const renderedAdmin = renderAdminHtml(rawAdmin, db);
+            fs.writeFileSync(adminPath, renderedAdmin, 'utf8');
         }
     } catch (e) {
         console.error("syncPagesToDisk error:", e);
@@ -965,7 +1158,7 @@ app.get('/api/bookings', requireAdminAuth, (req, res) => {
 // Update Booking Status (CRM Drag & Drop or Modal - Admin Only)
 app.put('/api/bookings/:id/status', requireAdminAuth, async (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, dateTimeStr, followUpDays, followUpNote } = req.body;
     
     const db = getDB();
     if(!db.bookings) db.bookings = [];
@@ -975,6 +1168,9 @@ app.put('/api/bookings/:id/status', requireAdminAuth, async (req, res) => {
     for(let b of db.bookings) {
         if(b.id === id) {
             b.status = status;
+            if (dateTimeStr) b.dateTimeStr = dateTimeStr;
+            if (followUpDays !== undefined) b.followUpDays = followUpDays;
+            if (followUpNote !== undefined) b.followUpNote = followUpNote;
             found = true;
             targetBooking = b;
             break;

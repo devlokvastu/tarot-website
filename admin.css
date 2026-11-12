@@ -826,6 +826,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-color: #ef4444 !important;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.6), 0 8px 24px -4px rgba(239, 68, 68, 0.45) !important;
 }
+.kanban-card.card-shifted-in[data-glow-status="Follow-Up"],
+.kanban-card.card-shifted-in[data-glow-status="FollowUp"],
+.kanban-card.card-shifted-in[data-glow-status="followup"] {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.6), 0 8px 24px -4px rgba(168, 85, 247, 0.45) !important;
+}
 
 
 /* --- Exact Reference Image Styles --- */
@@ -858,6 +864,17 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-color: rgba(255, 255, 255, 0.08);
 }
 .kanban-column[data-status="rescheduled"] .card-time { color: #d1d5db; }
+
+/* Follow-Up (Mystical Purple) */
+.kanban-column[data-status="followup"] .kanban-card {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(126, 34, 206, 0.08) 100%), #111827;
+    border-color: rgba(168, 85, 247, 0.45);
+}
+.kanban-column[data-status="followup"] .kanban-card:hover {
+    border-color: #c084fc;
+    box-shadow: 0 4px 18px rgba(168, 85, 247, 0.25);
+}
+.kanban-column[data-status="followup"] .card-time { color: #c084fc; }
 
 /* --- Card Inner Structure --- */
 .card-header {
