@@ -51,6 +51,10 @@
                 <button type="button" class="backup-btn" onclick="downloadDatabaseBackup()" title="Download current database file to upload to GitHub" style="margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.28); border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
                     <i class="fa-solid fa-cloud-arrow-down"></i> Backup / Download db.json
                 </button>
+                <button type="button" class="restore-btn" onclick="triggerRestoreDatabase()" title="Restore website content, plans, availability & bookings from an existing db.json backup" style="margin-top: 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.28); border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s, transform 0.2s;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Restore Backup db.json
+                </button>
+                <input type="file" id="restore-db-file" accept=".json,application/json" style="display: none;" onchange="handleRestoreDatabaseFile(this)">
                 <button type="button" class="logout-btn" onclick="logoutAdmin(event)" title="Log out of Admin Portal" style="margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; background: rgba(239, 68, 68, 0.12); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
                     <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
@@ -952,6 +956,10 @@ Personalized Remedies &amp; Guidance
                                 <button type="button" class="btn-secondary" onclick="downloadDatabaseBackup()" title="Download current database file to upload to GitHub" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #93c5fd; padding: 12px 18px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
                                     <i class="fa-solid fa-cloud-arrow-down"></i>
                                     Download db.json
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="triggerRestoreDatabase()" title="Upload and restore an existing db.json backup into Google Sheets" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #6ee7b7; padding: 12px 18px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background-color 0.2s ease, transform 0.2s ease;">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    Restore db.json
                                 </button>
                             </div>
                         </form>
