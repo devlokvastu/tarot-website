@@ -546,7 +546,11 @@
                                 return;
                             }
                             const bId = verifyData.bookingId || '';
-                            window.location.href = `success.html?bookingId=${encodeURIComponent(bId)}&paymentId=${encodeURIComponent(response.razorpay_payment_id)}`;
+                            let successUrl = `success.html?bookingId=${encodeURIComponent(bId)}&paymentId=${encodeURIComponent(response.razorpay_payment_id)}`;
+                            if (verifyData.slotConflict) {
+                                successUrl += `&conflict=1&msg=${encodeURIComponent(verifyData.message || 'Payment received! Your chosen slot was booked seconds ago, so our team will contact you shortly to reschedule.')}`;
+                            }
+                            window.location.href = successUrl;
                         } catch (err) {
                             console.error("Verification error:", err);
                             alert("Could not verify booking with server. Please contact support with Payment ID: " + response.razorpay_payment_id);

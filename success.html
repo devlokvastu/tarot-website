@@ -58,10 +58,40 @@
 </head>
 <body class="success-page">
     <div class="success-card">
-        <div class="check-icon">✅</div>
-        <h1>Payment Received, Booking Confirmed</h1>
-        <p>Thank you so much for your booking. You will receive a call on your contact number exactly at your scheduled time.</p>
+        <div class="check-icon" id="status-icon">✅</div>
+        <h1 id="status-title">Payment Received, Booking Confirmed</h1>
+        <p id="status-desc">Thank you so much for your booking. You will receive a call on your contact number exactly at your scheduled time.</p>
+        <p id="status-ref" style="display:none; font-size:0.88rem; opacity:0.85; margin-top:-10px; margin-bottom:20px;"></p>
         <a href="index.html" class="home-btn">Return to Homepage</a>
     </div>
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const bookingId = params.get('bookingId') || '';
+            const paymentId = params.get('paymentId') || '';
+            const isConflict = params.get('conflict') === '1';
+            const conflictMsg = params.get('msg') || '';
+
+            if (isConflict) {
+                const iconEl = document.getElementById('status-icon');
+                const titleEl = document.getElementById('status-title');
+                const descEl = document.getElementById('status-desc');
+                if (iconEl) { iconEl.textContent = '⚠️'; iconEl.style.color = '#fbbf24'; }
+                if (titleEl) titleEl.textContent = 'Payment Received — Reschedule Needed';
+                if (descEl) descEl.textContent = conflictMsg || 'Payment received! Your chosen slot was booked seconds ago, so our team will contact you shortly to reschedule.';
+            }
+
+            const parts = [];
+            if (bookingId) parts.push('Booking ID: ' + bookingId);
+            if (paymentId) parts.push('Payment ID: ' + paymentId);
+            if (parts.length) {
+                const refEl = document.getElementById('status-ref');
+                if (refEl) {
+                    refEl.textContent = parts.join('  •  ');
+                    refEl.style.display = 'block';
+                }
+            }
+        })();
+    </script>
 </body>
 </html>

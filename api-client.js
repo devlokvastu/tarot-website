@@ -57,36 +57,39 @@ window.GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycby7oS1Yxn_poJB
             try { bodyObj = JSON.parse(init.body); } catch (e) { bodyObj = {}; }
         }
 
-        // --- Route GET requests ---
+        // --- Route public GET requests (no admin token in URL query string) ---
         if (method === 'GET') {
-            let action = '';
             const qs = new URLSearchParams();
-            if (pathName === '/api/config') action = 'config';
-            else if (pathName === '/api/auth/check') action = 'auth_check';
-            else if (pathName === '/api/bookings') action = 'bookings';
-            else if (pathName === '/api/slots') {
-                action = 'slots';
+            if (pathName === '/api/slots') {
+                qs.set('action', 'slots');
                 qs.set('plan', parsed.searchParams.get('plan') || '0');
-            } else if (pathName === '/api/admin/export-database' || pathName === '/api/admin/export-db') {
-                action = 'export_database';
-            } else {
+                qs.set('_t', Date.now().toString());
+                const gasRes = await nativeFetch(`${GAS_URL}?${qs.toString()}`, { method: 'GET', redirect: 'follow' });
+                const json = await gasRes.json();
+                return makeJsonResponse(json, gasRes.status);
+            }
+            if (pathName === '/api/config' && !token) {
+                qs.set('action', 'config');
+                qs.set('_t', Date.now().toString());
+                const gasRes = await nativeFetch(`${GAS_URL}?${qs.toString()}`, { method: 'GET', redirect: 'follow' });
+                const json = await gasRes.json();
+                return makeJsonResponse(json, gasRes.status);
+            }
+            if (pathName !== '/api/auth/check' && pathName !== '/api/config' && pathName !== '/api/bookings' &&
+                pathName !== '/api/admin/export-database' && pathName !== '/api/admin/export-db') {
                 return makeJsonResponse({ error: 'Unsupported GET route: ' + pathName }, 404);
             }
-
-            qs.set('action', action);
-            if (token) qs.set('token', token);
-            qs.set('_t', Date.now().toString()); // Prevent stale GET caching
-
-            const gasRes = await nativeFetch(`${GAS_URL}?${qs.toString()}`, { method: 'GET', redirect: 'follow' });
-            const json = await gasRes.json();
-            return makeJsonResponse(json, gasRes.status);
         }
 
-        // --- Route POST / PUT / DELETE requests via CORS-safe text/plain ---
+        // --- Route authenticated reads & all mutations via POST (keeps tokens out of URLs) ---
         let postAction = '';
         const payload = { ...bodyObj, token: token };
 
-        if (pathName === '/api/auth/login') postAction = 'login';
+        if (method === 'GET' && pathName === '/api/auth/check') postAction = 'auth_check';
+        else if (method === 'GET' && pathName === '/api/config') postAction = 'config';
+        else if (method === 'GET' && pathName === '/api/bookings') postAction = 'bookings';
+        else if (method === 'GET' && (pathName === '/api/admin/export-database' || pathName === '/api/admin/export-db')) postAction = 'export_database';
+        else if (pathName === '/api/auth/login') postAction = 'login';
         else if (pathName === '/api/auth/logout') postAction = 'logout';
         else if (pathName === '/api/auth/forgot-password') {
             postAction = 'forgot_password';

@@ -1154,6 +1154,11 @@ window.loadBookings = async function() {
             const safeSub = escapeHtml(b.email ? b.email : (b.phone ? b.phone : b.id));
             const safeTime = escapeHtml(b.dateTimeStr || '');
             const safeId = escapeHtml(b.id || '');
+            const statusKey = b.status || 'Upcoming';
+            const isConflict = statusKey.toLowerCase().includes('conflict');
+            const conflictBadgeHtml = isConflict
+                ? `<div style="margin-top:6px; display:inline-block; font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:999px; background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid rgba(245,158,11,0.4);">Conflict - Reschedule</div>`
+                : '';
             card.innerHTML = `
                 <div class="card-options" role="button" tabindex="0" title="Expand Details View" onclick="event.stopPropagation(); openBookingModal('${safeId}');">
                     <i class="fa-solid fa-chevron-down"></i>
@@ -1168,12 +1173,13 @@ window.loadBookings = async function() {
                 <div class="card-time">
                     <i class="fa-regular fa-clock"></i> ${safeTime}
                 </div>
+                ${conflictBadgeHtml}
             `;
 
             // Normalize status to match column IDs
-            let statusKey = b.status || 'Upcoming';
             let col = document.getElementById('col-' + statusKey);
             if (!col && statusKey === 'Done') col = document.getElementById('col-Completed'); // Fallback
+            if (!col && isConflict) col = document.getElementById('col-Rescheduled');
             if (!col && (statusKey === 'Follow-Up' || statusKey === 'FollowUp' || statusKey === 'followup')) col = document.getElementById('col-FollowUp');
             if (!col) col = document.getElementById('col-Upcoming');
             
