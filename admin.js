@@ -1,3 +1,13 @@
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     
     // --- 0. Immediate 0ms Hydration from Preloaded Config or Cache ---
@@ -13,11 +23,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         const authRes = await fetch('/api/auth/check');
         const authData = await authRes.json();
         if (!authData.authenticated) {
-            window.location.replace('/login.html');
+            window.location.replace('login.html');
             return;
         }
+        const dashEl = document.querySelector('.dashboard');
+        if (dashEl) dashEl.style.visibility = 'visible';
     } catch (err) {
         console.error("Auth check error:", err);
+        const dashEl = document.querySelector('.dashboard');
+        if (dashEl) dashEl.style.visibility = 'visible';
     }
 
     // --- 0.1 Admin Logout Handler ---
@@ -29,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Logout error:", err);
         }
         localStorage.removeItem('admin_token');
-        window.location.replace('/login.html');
+        window.location.replace('login.html');
     };
 
     // --- 1. Tab Navigation ---
@@ -98,19 +112,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    // --- 3. Profile Image Upload Preview ---
+    // --- 3. Profile Image Upload Preview (Auto-compressed for fast loading & Google Sheets compatibility) ---
     const imageUploadInput = document.getElementById('profile-image-upload');
     const profilePreview = document.getElementById('profile-preview');
-    if(imageUploadInput && profilePreview) {
+    if (imageUploadInput && profilePreview) {
         imageUploadInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    profilePreview.src = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const img = new Image();
+                img.onload = function() {
+                    const maxDim = 320;
+                    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                    const w = Math.max(1, Math.round(img.width * scale));
+                    const h = Math.max(1, Math.round(img.height * scale));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    let compressed = canvas.toDataURL('image/webp', 0.8);
+                    if (!compressed.startsWith('data:image/webp') || compressed.length > 45000) {
+                        compressed = canvas.toDataURL('image/jpeg', 0.78);
+                    }
+                    profilePreview.src = compressed;
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
         });
     }
 
@@ -122,7 +152,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Populate Settings
             if (data.settings) {
                 const coolSetting = document.getElementById('setting-cooling');
-                if (coolSetting) coolSetting.value = data.settings.cooling || 15;
+                if (coolSetting) coolSetting.value = data.settings.cooling !== undefined ? data.settings.cooling : 15;
+                const dailyMaxSetting = document.getElementById('setting-daily-max');
+                if (dailyMaxSetting) dailyMaxSetting.value = data.settings.dailyMaxSessions > 0 ? data.settings.dailyMaxSessions : '';
             }
 
             // Populate Content & All CMS Fields
@@ -798,6 +830,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const payload = { settings: {}, availability: {} };
             
             payload.settings.cooling = parseInt(document.getElementById('setting-cooling').value) || 0;
+            const dailyMaxEl = document.getElementById('setting-daily-max');
+            payload.settings.dailyMaxSessions = dailyMaxEl ? (parseInt(dailyMaxEl.value) || 0) : 0;
             
             const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
             days.forEach(day => {
@@ -963,7 +997,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
-
 // --- CRM Kanban Drag and Drop Logic ---
 window.isCardDragging = false;
 
@@ -1116,19 +1149,24 @@ window.loadBookings = async function() {
                 if (window.isCardDragging) return;
                 openBookingModal(b.id);
             };
+            const safeName = escapeHtml(b.name || 'Client');
+            const safeInitial = escapeHtml((b.name || 'C').charAt(0).toUpperCase());
+            const safeSub = escapeHtml(b.email ? b.email : (b.phone ? b.phone : b.id));
+            const safeTime = escapeHtml(b.dateTimeStr || '');
+            const safeId = escapeHtml(b.id || '');
             card.innerHTML = `
-                <div class="card-options" role="button" tabindex="0" title="Expand Details View" onclick="event.stopPropagation(); openBookingModal('${b.id}');">
+                <div class="card-options" role="button" tabindex="0" title="Expand Details View" onclick="event.stopPropagation(); openBookingModal('${safeId}');">
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <div class="card-header">
-                    <div class="avatar">${b.name.charAt(0).toUpperCase()}</div>
+                    <div class="avatar">${safeInitial}</div>
                     <div class="client-info">
-                        <h4>${b.name}</h4>
-                        <p>${b.email ? b.email : (b.phone ? b.phone : b.id)}</p>
+                        <h4>${safeName}</h4>
+                        <p>${safeSub}</p>
                     </div>
                 </div>
                 <div class="card-time">
-                    <i class="fa-regular fa-clock"></i> ${b.dateTimeStr}
+                    <i class="fa-regular fa-clock"></i> ${safeTime}
                 </div>
             `;
 
@@ -1823,7 +1861,8 @@ window.openBookingModal = function(id) {
 
     const phoneEl = document.getElementById('modal-phone');
     phoneEl.innerText = booking.phone || 'N/A';
-    phoneEl.href = booking.phone ? 'tel:' + booking.phone : '#';
+    const cleanTel = booking.phone ? String(booking.phone).replace(/[^0-9+\-\s()]/g, '') : '';
+    phoneEl.href = cleanTel ? 'tel:' + cleanTel : '#';
 
     document.getElementById('modal-dob').innerText = booking.dob || 'N/A';
     document.getElementById('modal-location').innerText = booking.location || 'N/A';
@@ -2801,3 +2840,21 @@ document.addEventListener('fullscreenchange', updateFullScreenUI);
 document.addEventListener('webkitfullscreenchange', updateFullScreenUI);
 document.addEventListener('mozfullscreenchange', updateFullScreenUI);
 document.addEventListener('MSFullscreenChange', updateFullScreenUI);
+
+window.downloadDatabaseBackup = async function() {
+    try {
+        const res = await fetch('/api/admin/export-database');
+        if (!res.ok) throw new Error('Unauthorized or export failed');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'db.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert('Could not download backup: ' + e.message);
+    }
+};

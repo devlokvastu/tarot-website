@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="booking.css?v=37">
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="api-client.js"></script>
     <script>
         (function() {
             try {
@@ -469,19 +470,29 @@
                 const orderData = await orderRes.json();
 
                 if (!orderRes.ok || !orderData.keyId) {
-                    // Fallback: If Razorpay keys are not yet configured in admin
-                    console.warn("Razorpay key not active, falling back to direct booking registration.");
-                    const res = await fetch('/api/book', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, dob, phone, location: loc, dateTimeStr, planId })
-                    });
-                    if (res.ok) {
-                        window.location.href = 'success.html';
+                    if (orderRes.status === 409) {
+                        alert(orderData.error || "Sorry, this slot was just booked by someone else. Please select another slot.");
+                        goToStep1();
+                        loadSlots();
+                        resetBtn();
                         return;
-                    } else {
-                        throw new Error(orderData.error || "Booking server error");
                     }
+                    if (orderData && orderData.razorpayNotConfigured) {
+                        // Only fallback when Razorpay Key ID is explicitly not configured
+                        console.warn("Razorpay key not configured, falling back to direct booking registration.");
+                        const res = await fetch('/api/book', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, dob, phone, location: loc, dateTimeStr, planId })
+                        });
+                        const resData = await res.json().catch(() => ({}));
+                        if (res.ok) {
+                            window.location.href = `success.html?bookingId=${encodeURIComponent(resData.bookingId || '')}`;
+                            return;
+                        }
+                        throw new Error(resData.error || "Booking server error");
+                    }
+                    throw new Error((orderData && orderData.error) || "Payment initiation failed.");
                 }
 
                 // Ensure Razorpay SDK script is ready
@@ -529,11 +540,17 @@
                                 })
                             });
                             const verifyData = await verifyRes.json();
-                            const bId = (verifyData && verifyData.bookingId) ? verifyData.bookingId : '';
-                            window.location.href = `success.html?bookingId=${bId}&paymentId=${response.razorpay_payment_id}`;
+                            if (!verifyRes.ok || !verifyData.success) {
+                                alert((verifyData && verifyData.error) || "Payment verification failed. If amount was deducted, please contact support with Payment ID: " + response.razorpay_payment_id);
+                                resetBtn();
+                                return;
+                            }
+                            const bId = verifyData.bookingId || '';
+                            window.location.href = `success.html?bookingId=${encodeURIComponent(bId)}&paymentId=${encodeURIComponent(response.razorpay_payment_id)}`;
                         } catch (err) {
                             console.error("Verification error:", err);
-                            window.location.href = 'success.html';
+                            alert("Could not verify booking with server. Please contact support with Payment ID: " + response.razorpay_payment_id);
+                            resetBtn();
                         }
                     },
                     modal: {
