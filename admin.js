@@ -2864,3 +2864,77 @@ window.downloadDatabaseBackup = async function() {
         alert('Could not download backup: ' + e.message);
     }
 };
+
+window.triggerRestoreDatabase = function() {
+    const fileInput = document.getElementById('restore-db-file');
+    if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+    }
+};
+
+window.handleRestoreDatabaseFile = async function(input) {
+    const file = input && input.files && input.files[0];
+    if (!file) return;
+
+    try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || typeof parsed !== 'object' || (!parsed.content && !parsed.plans && !parsed.availability)) {
+            alert('Invalid db.json file. Please select a valid TrikalDarshi database backup.');
+            return;
+        }
+
+        const safeContent = parsed.content ? { ...parsed.content } : undefined;
+        if (safeContent && typeof safeContent.profilePic === 'string' && safeContent.profilePic.startsWith('data:') && safeContent.profilePic.length > 45000) {
+            safeContent.profilePic = 'profile-avatar.webp';
+        }
+
+        const configPayload = {};
+        if (safeContent) configPayload.content = safeContent;
+        if (Array.isArray(parsed.plans)) configPayload.plans = parsed.plans;
+        if (parsed.unlistedPlan) configPayload.unlistedPlan = parsed.unlistedPlan;
+        if (parsed.availability) configPayload.availability = parsed.availability;
+        if (Array.isArray(parsed.blockedDates)) configPayload.blockedDates = parsed.blockedDates;
+        if (parsed.settings) configPayload.settings = parsed.settings;
+
+        if (!confirm('Restore content, plans, availability, and settings from "' + file.name + '" into your backend? (Your existing Razorpay keys and Admin password will NOT be overwritten.)')) {
+            return;
+        }
+
+        const cfgRes = await fetch('/api/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(configPayload)
+        });
+        const cfgData = await cfgRes.json().catch(() => ({}));
+        if (!cfgRes.ok || !cfgData.success) {
+            throw new Error(cfgData.error || 'Failed to restore configuration.');
+        }
+
+        let bookingSummary = '';
+        if (Array.isArray(parsed.bookings) && parsed.bookings.length > 0) {
+            if (confirm('Settings restored! Also import ' + parsed.bookings.length + ' bookings from "' + file.name + '"? (Existing bookings are automatically skipped.)')) {
+                const impRes = await fetch('/api/bookings/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bookings: parsed.bookings })
+                });
+                const impData = await impRes.json().catch(() => ({}));
+                if (impRes.ok && impData.success) {
+                    bookingSummary = `\nBookings added: ${impData.addedCount || 0} (duplicates skipped: ${impData.duplicatesBlocked || 0})`;
+                }
+            }
+        }
+
+        try { localStorage.removeItem('trikaldarshi_config'); } catch (e) {}
+        if (typeof window.populateConfigData === 'function') await window.populateConfigData();
+        if (typeof window.loadBookings === 'function') await window.loadBookings();
+        alert('Backup restored successfully!' + bookingSummary);
+    } catch (e) {
+        console.error('Restore failed:', e);
+        alert('Could not restore backup: ' + e.message);
+    } finally {
+        input.value = '';
+    }
+};
