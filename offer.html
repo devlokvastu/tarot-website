@@ -11,44 +11,18 @@
     <script>
         (function() {
             window.__CONFIG_FETCH_PROMISE__ = fetch('/api/config').then(function(r) { return r.json(); });
-            var isJustSaved = false;
             try {
                 var cached = localStorage.getItem('trikaldarshi_config');
                 if (cached) {
                     var parsed = JSON.parse(cached);
                     if (parsed && parsed.content) {
                         window.__PRELOADED_CONFIG__ = parsed;
-                        if (parsed._savedAt && (Date.now() - Number(parsed._savedAt)) < 15000) {
-                            isJustSaved = true;
-                        }
                     }
                 }
             } catch(e) {}
-            if (!isJustSaved) {
-                document.documentElement.classList.add('cms-syncing');
-                setTimeout(function() {
-                    document.documentElement.classList.remove('cms-syncing');
-                }, 3500);
-            }
         })();
     </script>
     <style>
-        html.cms-syncing .hero h1,
-        html.cms-syncing .hero p,
-        html.cms-syncing .hero .cta-button,
-        html.cms-syncing .hero .social-proof,
-        html.cms-syncing .single-plan-card,
-        html.cms-syncing .fixed-bottom-bar {
-            opacity: 0;
-        }
-        .hero h1, .hero p, .hero .cta-button, .hero .social-proof, .single-plan-card, .fixed-bottom-bar {
-            transition: opacity 0.18s ease;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .hero h1, .hero p, .hero .cta-button, .hero .social-proof, .single-plan-card, .fixed-bottom-bar {
-                transition: none;
-            }
-        }
         /* Standalone Unlisted Offer Page Enhancements */
         .offer-badge {
             display: inline-block;
@@ -903,9 +877,9 @@
             }
         }
 
-        // Apply immediately only if preloaded cache is freshly saved; otherwise await head fetch cleanly
+        // Apply immediately (0ms delay) from preloaded or cached data
         const initialOfferConfig = window.__PRELOADED_CONFIG__;
-        if (initialOfferConfig && !document.documentElement.classList.contains('cms-syncing')) {
+        if (initialOfferConfig) {
             applyOfferConfig(initialOfferConfig);
         }
 
@@ -917,9 +891,6 @@
                 applyOfferConfig(db);
             } catch (e) {
                 console.error("Failed to load offer page config", e);
-                if (initialOfferConfig) applyOfferConfig(initialOfferConfig);
-            } finally {
-                document.documentElement.classList.remove('cms-syncing');
             }
 
             // 3. Precise Countdown Timer
