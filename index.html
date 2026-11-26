@@ -129,6 +129,11 @@
         function applyConfig(db) {
             if (!db) return;
             try {
+                const escHtml = (s) => {
+                    const d = document.createElement('div');
+                    d.textContent = String(s || '');
+                    return d.innerHTML;
+                };
                 const c = db.content;
                 if (c) {
                     if (c.siteName && c.readerName) {
@@ -193,12 +198,12 @@
                         const testContainer = document.querySelector('.testimonial-container');
                         if (testContainer) {
                             const currentCards = testContainer.querySelectorAll('.testimonial-card');
-                            if (currentCards.length !== c.reviews.length || !testContainer.innerHTML.includes(c.reviews[0].quote)) {
+                            if (currentCards.length !== c.reviews.length || !testContainer.innerHTML.includes(escHtml(c.reviews[0].quote))) {
                                 testContainer.innerHTML = c.reviews.map(r => `
                                     <div class="testimonial-card">
                                         <div class="stars">★★★★★</div>
-                                        <p class="quote">"${r.quote}"</p>
-                                        <p class="author">${r.author}</p>
+                                        <p class="quote">"${escHtml(r.quote)}"</p>
+                                        <p class="author">${escHtml(r.author)}</p>
                                     </div>
                                 `).join('');
                             }
@@ -237,11 +242,6 @@
                                 if (btnEl && btnEl.innerText.trim() !== expectedBtn) btnEl.innerText = expectedBtn;
                             }
                         } else {
-                            const escHtml = (s) => {
-                                const d = document.createElement('div');
-                                d.textContent = String(s || '');
-                                return d.innerHTML;
-                            };
                             container.innerHTML = db.plans.map((plan, index) => {
                                 const isPopular = index === 1;
                                 const planDuration = plan.duration || '30';

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Trikal Darshi Tarot | Exclusive Offer</title>
-    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="style.css?v=21">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="api-client.js"></script>
@@ -773,6 +773,11 @@
         function applyOfferConfig(db) {
             if (!db) return;
             try {
+                const escHtml = (s) => {
+                    const d = document.createElement('div');
+                    d.textContent = String(s || '');
+                    return d.innerHTML;
+                };
                 // 1. Bio & Site CMS Sync (Same-to-Same Bio)
                 if (db.content) {
                     const c = db.content;
@@ -812,14 +817,18 @@
                         const footerP = document.querySelector('footer p');
                         if (footerP) footerP.innerText = c.footerCopyright;
                     }
+                    if (c.testimonialsTitle) {
+                        const testH2 = document.querySelector('.testimonials h2');
+                        if (testH2) testH2.innerText = c.testimonialsTitle;
+                    }
                     if (c.reviews && c.reviews.length > 0) {
                         const testContainer = document.querySelector('.testimonial-container');
                         if (testContainer) {
                             testContainer.innerHTML = c.reviews.map(r => `
                                 <div class="testimonial-card">
                                     <div class="stars">★★★★★</div>
-                                    <p class="quote">"${r.quote}"</p>
-                                    <p class="author">${r.author}</p>
+                                    <p class="quote">"${escHtml(r.quote)}"</p>
+                                    <p class="author">${escHtml(r.author)}</p>
                                 </div>
                             `).join('');
                         }
@@ -862,7 +871,7 @@
                     if (p.features && p.features.length > 0) {
                         const featList = document.getElementById('offer-features-list');
                         featList.innerHTML = p.features.map(f => `
-                            <li><i class="fa-solid fa-circle-check"></i> <span>${f}</span></li>
+                            <li><i class="fa-solid fa-circle-check"></i> <span>${escHtml(f)}</span></li>
                         `).join('');
                     }
 

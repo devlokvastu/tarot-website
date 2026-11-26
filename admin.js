@@ -191,12 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (c.plansHeading && document.getElementById('content-plans-heading')) document.getElementById('content-plans-heading').value = c.plansHeading;
                 if (c.plansSubheading && document.getElementById('content-plans-subheading')) document.getElementById('content-plans-subheading').value = c.plansSubheading;
 
-                // 4. Booking Screen Copy
-                if (c.bookingHeadline && document.getElementById('content-booking-headline')) document.getElementById('content-booking-headline').value = c.bookingHeadline;
-                if (c.bookingSubtitle && document.getElementById('content-booking-subtitle')) document.getElementById('content-booking-subtitle').value = c.bookingSubtitle;
-                if (c.bookingTrustBanner && document.getElementById('content-booking-trust')) document.getElementById('content-booking-trust').value = c.bookingTrustBanner;
-
-                // 5. Testimonials
+                // 4. Testimonials
                 if (c.testimonialsTitle && document.getElementById('content-testimonials-title')) document.getElementById('content-testimonials-title').value = c.testimonialsTitle;
                 if (c.reviews && c.reviews.length >= 3) {
                     if (document.getElementById('content-review1-quote')) document.getElementById('content-review1-quote').value = c.reviews[0].quote;
@@ -922,9 +917,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     socialProofText: document.getElementById('content-social-proof')?.value.trim() || "⭐ Trusted by 2,000+ followers & clients",
                     plansHeading: document.getElementById('content-plans-heading')?.value.trim() || "Choose Your Reading",
                     plansSubheading: document.getElementById('content-plans-subheading')?.value.trim() || "Get the clarity you need, with the right guidance for your journey.",
-                    bookingHeadline: document.getElementById('content-booking-headline')?.value.trim() || "Schedule Your Reading",
-                    bookingSubtitle: document.getElementById('content-booking-subtitle')?.value.trim() || "Get the clarity you need, with the right guidance for your journey.",
-                    bookingTrustBanner: document.getElementById('content-booking-trust')?.value.trim() || "REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY",
                     testimonialsTitle: document.getElementById('content-testimonials-title')?.value.trim() || "Client Testimonials",
                     reviews: [
                         {
