@@ -1302,6 +1302,7 @@ Personalized Remedies &amp; Guidance
                         const prev = JSON.parse(localStorage.getItem('trikaldarshi_config') || '{}');
                         prev.unlistedPlan = { ...(prev.unlistedPlan || {}), ...payload.unlistedPlan };
                         prev.content = { ...(prev.content || {}), ...payload.content };
+                        prev._savedAt = Date.now();
                         localStorage.setItem('trikaldarshi_config', JSON.stringify(prev));
                     } catch (e) {
                         try { localStorage.removeItem('trikaldarshi_config'); } catch (ex) {}

@@ -9,20 +9,48 @@
     <script src="api-client.js"></script>
     <script id="__PRELOADED_CONFIG_SCRIPT__">
         (function() {
-            var fallbackConfig = {"content":{"siteName":"Trikal Darshi Tarot","readerName":"Coach Sanjay Kr Das","themeColor":"#510518","profilePic":"profile-avatar.webp","headerText":"Clarity on Love, Career & Future.","bioText":"Namaste! I'm Coach Sanjay. Through intuitive Tarot reading and genuine counseling, I help you find clear answers, overcome confusion, and choose the right path in life.","heroCtaText":"Book Your Session","socialProofText":"Trusted by ⭐⭐⭐⭐⭐(500+) followers & clients","plansHeading":"Choose Your Reading","plansSubheading":"Get the clarity you need, with the right guidance for your journey.","bookingHeadline":"Schedule Your Reading","bookingSubtitle":"Get the clarity you need, with the right guidance for your journey.","bookingTrustBanner":"REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY","testimonialsTitle":"Client Testimonials","reviews":[{"quote":"Sir ki reading ekdum spot on thi!! Mai apne career ko leke bhot confuse tha, samaj nai aara tha kya karu. But unhone jo bataya exactly wahi ho rha hai abhi 🙏 Highly recommend","author":"- Rahul M."},{"quote":"Mera bhot bura time chal rha tha relationship me aur main tension me thi. Sanjay sir ne jo advice di it was so true 🥺 ab kafi peace hai life me. Thanku so much sir ❤️","author":"- Neha K."},{"quote":"Pehle muje in sab pe itna trust nhi tha tbh.. par just try kiya tha aise hi nd I am mind blown 🤯 Unhone past ki aisi batein batai jo kisi ko ni pta. Best tarot reader!!","author":"- Priya S."}],"footerCopyright":"© 2026 Coach Sanjay. All rights reserved."},"plans":[{"name":"1 Question Reading","price":"349","desc":"Perfect for quick tarot clarity.","duration":"15","features":["Quick & Focused Insights","Answers to Your Specific Question"]},{"name":"3 Question Reading","price":"1100","desc":"Deep relationship & emotional guidance.","duration":"30","features":["Relationship Clarity","Emotional Healing","Actionable Guidance"]},{"name":"6 Question Reading","price":"1500","desc":"Comprehensive 1-on-1 tarot coaching.","duration":"40","features":["In-Depth Analysis","Personalized Guidance","Support for Long-Term Growth"]},{"name":"Personal Coaching","price":"5100","desc":"Strategic tarot forecast for your year.","duration":"30","features":["Month-by-Month Breakdown","Extensive 20+ Page PDF","Priority Support"]}],"settings":{"cooling":10,"dailyMaxSessions":0},"unlistedPlan":{"badge":"Special Private Offer","timerBadge":"Limited Time Offer","ctaText":"Book Now For ₹49","bullet1":"1-on-1 Personalized Reading","features":["Deep Relationship, Career & Life Analysis","Immediate Guidance on Urgent Life Decisions","Personalized Remedies & Guidance","100% Confidential Live Video / Audio Session"],"desc":"Direct priority consultation with Coach Sanjay for urgent life guidance.","bullet3":"Limited Slots Available Today","name":"Exclusive 1-on-1 Tarot & Life Clarity Session","price":"49","duration":"30","timerMinutes":2,"originalPrice":"599","bullet2":"Confidential & Live Consultation","active":true}};
+            window.__CONFIG_FETCH_PROMISE__ = fetch('/api/config').then(function(r) { return r.json(); });
+            var fallbackConfig = {"content":{"siteName":"Trikal Darshi Tarot","readerName":"Coach Sanjay Kr Das","themeColor":"#510518","profilePic":"profile-avatar.webp","headerText":"Clarity on Love, Career & Life.","bioText":"Namaste! I'm Coach Sanjay. Through intuitive Tarot reading and genuine counseling, I help you find clear answers, overcome confusion, and choose the right path in life.","heroCtaText":"Book Your Session","socialProofText":"Trusted by ⭐⭐⭐⭐⭐(500+) followers & clients","plansHeading":"Choose Your Reading","plansSubheading":"Get the clarity you need, with the right guidance for your journey.","bookingHeadline":"Schedule Your Reading","bookingSubtitle":"Get the clarity you need, with the right guidance for your journey.","bookingTrustBanner":"REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY","testimonialsTitle":"Client Testimonials","reviews":[{"quote":"Sir ki reading ekdum spot on thi!! Mai apne career ko leke bhot confuse tha, samaj nai aara tha kya karu. But unhone jo bataya exactly wahi ho rha hai abhi 🙏 Highly recommend","author":"- Rahul M."},{"quote":"Mera bhot bura time chal rha tha relationship me aur main tension me thi. Sanjay sir ne jo advice di it was so true 🥺 ab kafi peace hai life me. Thanku so much sir ❤️","author":"- Neha K."},{"quote":"Pehle muje in sab pe itna trust nhi tha tbh.. par just try kiya tha aise hi nd I am mind blown 🤯 Unhone past ki aisi batein batai jo kisi ko ni pta. Best tarot reader!!","author":"- Priya S."}],"footerCopyright":"© 2026 Coach Sanjay. All rights reserved."},"plans":[{"name":"1 Question Reading","price":"349","desc":"Perfect for quick tarot clarity.","duration":"15","features":["Quick & Focused Insights","Answers to Your Specific Question"]},{"name":"3 Question Reading","price":"1100","desc":"Deep relationship & emotional guidance.","duration":"30","features":["Relationship Clarity","Emotional Healing","Actionable Guidance"]},{"name":"6 Question Reading","price":"1500","desc":"Comprehensive 1-on-1 tarot coaching.","duration":"40","features":["In-Depth Analysis","Personalized Guidance","Support for Long-Term Growth"]},{"name":"Personal Coaching","price":"5100","desc":"Strategic tarot forecast for your year.","duration":"30","features":["Month-by-Month Breakdown","Extensive 20+ Page PDF","Priority Support"]}],"settings":{"cooling":10,"dailyMaxSessions":0},"unlistedPlan":{"badge":"Special Private Offer","timerBadge":"Limited Time Offer","ctaText":"Book Now For ₹1","bullet1":"1-on-1 Private Reading","features":["Deep Relationship, Career & Life Analysis","Immediate Guidance on Urgent Life Decisions","Personalized Guidance","100% Confidential Session on Call"],"desc":"✨ This session is absolutely FREE! We charge just ₹1 as a symbolic energy exchange to ensure that we connect with people who are genuinely serious and committed.  It's not about the money; it's about mutual respect, commitment, and valuing the energy invested in your guidance. ❤️","bullet3":"Limited Slots Available Today","name":"Exclusive 1-on-1 Tarot & Life Clarity Session","price":"1","duration":"20","timerMinutes":2,"originalPrice":"499","bullet2":"Confidential & Live Consultation","active":true}};
+            var isJustSaved = false;
             try {
                 var cached = localStorage.getItem('trikaldarshi_config');
                 if (cached) {
                     var parsed = JSON.parse(cached);
                     if (parsed && parsed.content) {
                         window.__PRELOADED_CONFIG__ = parsed;
+                        if (parsed._savedAt && (Date.now() - Number(parsed._savedAt)) < 15000) {
+                            isJustSaved = true;
+                        }
+                        if (!isJustSaved) {
+                            document.documentElement.classList.add('cms-syncing');
+                            setTimeout(function() { document.documentElement.classList.remove('cms-syncing'); }, 3500);
+                        }
                         return;
                     }
                 }
             } catch(e) {}
             window.__PRELOADED_CONFIG__ = fallbackConfig;
+            document.documentElement.classList.add('cms-syncing');
+            setTimeout(function() { document.documentElement.classList.remove('cms-syncing'); }, 3500);
         })();
     </script>
+    <style>
+        html.cms-syncing .hero h1,
+        html.cms-syncing .hero p,
+        html.cms-syncing .hero .cta-button,
+        html.cms-syncing .hero .social-proof,
+        html.cms-syncing .plans-container {
+            opacity: 0;
+        }
+        .hero h1, .hero p, .hero .cta-button, .hero .social-proof, .plans-container {
+            transition: opacity 0.18s ease;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero h1, .hero p, .hero .cta-button, .hero .social-proof, .plans-container {
+                transition: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -33,7 +61,7 @@
         <div class="profile-container">
             <img src="profile-avatar.webp" alt="Coach Sanjay Kr Das" class="profile-pic" width="170" height="170" loading="eager">
         </div>
-        <h1>Clarity on Love, Career &amp; Future.</h1>
+        <h1>Clarity on Love, Career &amp; Life.</h1>
         <p>Namaste! I'm Coach Sanjay. Through intuitive Tarot reading and genuine counseling, I help you find clear answers, overcome confusion, and choose the right path in life.</p>
         <a href="#plans" class="cta-button">Book Your Session</a>
         <div class="social-proof">Trusted by ⭐⭐⭐⭐⭐(500+) followers &amp; clients</div>
@@ -271,18 +299,14 @@
             }
         }
 
-        // Apply immediately if preloaded
-        if (window.__PRELOADED_CONFIG__) {
+        // Apply immediately only if preloaded cache is freshly saved; otherwise await head fetch cleanly
+        if (window.__PRELOADED_CONFIG__ && !document.documentElement.classList.contains('cms-syncing')) {
             applyConfig(window.__PRELOADED_CONFIG__);
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (window.__PRELOADED_CONFIG__) {
-                applyConfig(window.__PRELOADED_CONFIG__);
-            }
             try {
-                const res = await fetch('/api/config');
-                const db = await res.json();
+                const db = await (window.__CONFIG_FETCH_PROMISE__ || fetch('/api/config').then(r => r.json()));
                 window.__PRELOADED_CONFIG__ = db;
                 try { localStorage.setItem('trikaldarshi_config', JSON.stringify(db)); } catch(e){}
                 applyConfig(db);
@@ -293,6 +317,9 @@
                 }
             } catch (e) {
                 console.error("Failed to fetch dynamic content from backend:", e);
+                if (window.__PRELOADED_CONFIG__) applyConfig(window.__PRELOADED_CONFIG__);
+            } finally {
+                document.documentElement.classList.remove('cms-syncing');
             }
         });
     </script>

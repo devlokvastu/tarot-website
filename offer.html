@@ -10,19 +10,45 @@
     <script src="api-client.js"></script>
     <script>
         (function() {
+            window.__CONFIG_FETCH_PROMISE__ = fetch('/api/config').then(function(r) { return r.json(); });
+            var isJustSaved = false;
             try {
-                if (window.__PRELOADED_CONFIG__) {
-                    localStorage.setItem('trikaldarshi_config', JSON.stringify(window.__PRELOADED_CONFIG__));
-                } else {
-                    var cached = localStorage.getItem('trikaldarshi_config');
-                    if (cached) {
-                        window.__PRELOADED_CONFIG__ = JSON.parse(cached);
+                var cached = localStorage.getItem('trikaldarshi_config');
+                if (cached) {
+                    var parsed = JSON.parse(cached);
+                    if (parsed && parsed.content) {
+                        window.__PRELOADED_CONFIG__ = parsed;
+                        if (parsed._savedAt && (Date.now() - Number(parsed._savedAt)) < 15000) {
+                            isJustSaved = true;
+                        }
                     }
                 }
             } catch(e) {}
+            if (!isJustSaved) {
+                document.documentElement.classList.add('cms-syncing');
+                setTimeout(function() {
+                    document.documentElement.classList.remove('cms-syncing');
+                }, 3500);
+            }
         })();
     </script>
     <style>
+        html.cms-syncing .hero h1,
+        html.cms-syncing .hero p,
+        html.cms-syncing .hero .cta-button,
+        html.cms-syncing .hero .social-proof,
+        html.cms-syncing .single-plan-card,
+        html.cms-syncing .fixed-bottom-bar {
+            opacity: 0;
+        }
+        .hero h1, .hero p, .hero .cta-button, .hero .social-proof, .single-plan-card, .fixed-bottom-bar {
+            transition: opacity 0.18s ease;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero h1, .hero p, .hero .cta-button, .hero .social-proof, .single-plan-card, .fixed-bottom-bar {
+                transition: none;
+            }
+        }
         /* Standalone Unlisted Offer Page Enhancements */
         .offer-badge {
             display: inline-block;
@@ -651,9 +677,9 @@
         <div class="profile-container">
             <img src="profile-avatar.webp" alt="Coach Sanjay Kr Das" class="profile-pic" width="170" height="170" loading="eager">
         </div>
-        <h1>Clarity on Love, Career &amp; Future.</h1>
+        <h1>Clarity on Love, Career &amp; Life.</h1>
         <p>Namaste! I'm Coach Sanjay. Through intuitive Tarot reading and genuine counseling, I help you find clear answers, overcome confusion, and choose the right path in life.</p>
-        <a href="#plan-offer" class="cta-button">Claim Exclusive Offer</a>
+        <a href="#plan-offer" class="cta-button">Book Your Free Session Now!</a>
         <div class="social-proof">Trusted by ⭐⭐⭐⭐⭐(500+) followers &amp; clients</div>
     </section>
 
@@ -665,26 +691,26 @@
             <div class="single-plan-card">
                 <span class="offer-badge" id="offer-badge-text">Special Private Offer</span>
                 <h3 id="offer-plan-name">Exclusive 1-on-1 Tarot &amp; Life Clarity Session</h3>
-                <p class="single-plan-desc" id="offer-plan-desc">Direct priority consultation with Coach Sanjay for urgent life guidance.</p>
+                <p class="single-plan-desc" id="offer-plan-desc">✨ This session is absolutely FREE! We charge just ₹1 as a symbolic energy exchange to ensure that we connect with people who are genuinely serious and committed.  It's not about the money; it's about mutual respect, commitment, and valuing the energy invested in your guidance. ❤️</p>
                 
                 <div class="price-box">
-                    <span class="price-current" id="offer-plan-price">₹49</span>
-                    <span class="price-original" id="offer-plan-orig-price">₹599</span>
-                    <span class="save-tag" id="offer-save-tag">Save 92%</span>
+                    <span class="price-current" id="offer-plan-price">₹1</span>
+                    <span class="price-original" id="offer-plan-orig-price">₹499</span>
+                    <span class="save-tag" id="offer-save-tag">Save 100%</span>
                 </div>
                 
                 <div class="session-duration">
-                    <span>⏱️</span> <span id="offer-plan-duration">30 Mins Session</span>
+                    <span>⏱️</span> <span id="offer-plan-duration">20 Mins Session</span>
                 </div>
 
                 <ul class="features-list" id="offer-features-list">
                     <li><i class="fa-solid fa-circle-check"></i> <span>Deep Relationship, Career &amp; Life Analysis</span></li>
                     <li><i class="fa-solid fa-circle-check"></i> <span>Immediate Guidance on Urgent Life Decisions</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>Personalized Remedies &amp; Guidance</span></li>
-                    <li><i class="fa-solid fa-circle-check"></i> <span>100% Confidential Live Video / Audio Session</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>Personalized Guidance</span></li>
+                    <li><i class="fa-solid fa-circle-check"></i> <span>100% Confidential Session on Call</span></li>
                 </ul>
 
-                <button class="btn-claim-plan" id="main-offer-btn" onclick="window.location.href='booking.html?plan=unlisted'">Book Exclusive Session • ₹49</button>
+                <button class="btn-claim-plan" id="main-offer-btn" onclick="window.location.href='booking.html?plan=unlisted'">Book Your Session • ₹1</button>
             </div>
         </div>
     </section>
@@ -744,11 +770,11 @@
             <div class="sticky-bullets-wrap">
                 <div class="sticky-bullet-item" id="bar-bullet-1">
                     <span class="sticky-bullet-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
-                    <span id="bar-bullet-1-text">1-on-1 Personalized Reading</span>
+                    <span id="bar-bullet-1-text">1-on-1 Private Reading</span>
                 </div>
                 <div class="sticky-bullet-item" id="bar-bullet-2">
                     <span class="sticky-bullet-icon"><i class="fa-solid fa-user-shield"></i></span>
-                    <span id="bar-bullet-2-text">Confidential & Live Consultation</span>
+                    <span id="bar-bullet-2-text">Confidential &amp; Live Consultation</span>
                 </div>
                 <div class="sticky-bullet-item" id="bar-bullet-3">
                     <span class="sticky-bullet-icon"><i class="fa-solid fa-hourglass-half"></i></span>
@@ -758,7 +784,7 @@
 
             <!-- 3. Vibrant Glow CTA Button (Right) -->
             <a href="booking.html?plan=unlisted" class="sticky-cta-btn" id="bar-cta-btn">
-                ENROLL NOW
+                Book Now For ₹1
             </a>
 
         </div>
@@ -877,26 +903,23 @@
             }
         }
 
-        // Apply immediately (0ms delay) from preloaded or cached data
-        const initialOfferConfig = window.__PRELOADED_CONFIG__ || (() => {
-            try { return JSON.parse(localStorage.getItem('trikaldarshi_config')); } catch(e){ return null; }
-        })();
-        if (initialOfferConfig) {
+        // Apply immediately only if preloaded cache is freshly saved; otherwise await head fetch cleanly
+        const initialOfferConfig = window.__PRELOADED_CONFIG__;
+        if (initialOfferConfig && !document.documentElement.classList.contains('cms-syncing')) {
             applyOfferConfig(initialOfferConfig);
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (initialOfferConfig) {
-                applyOfferConfig(initialOfferConfig);
-            }
             try {
-                const res = await fetch('/api/config');
-                const db = await res.json();
+                const db = await (window.__CONFIG_FETCH_PROMISE__ || fetch('/api/config').then(r => r.json()));
                 window.__PRELOADED_CONFIG__ = db;
                 try { localStorage.setItem('trikaldarshi_config', JSON.stringify(db)); } catch(e){}
                 applyOfferConfig(db);
             } catch (e) {
                 console.error("Failed to load offer page config", e);
+                if (initialOfferConfig) applyOfferConfig(initialOfferConfig);
+            } finally {
+                document.documentElement.classList.remove('cms-syncing');
             }
 
             // 3. Precise Countdown Timer

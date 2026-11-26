@@ -808,6 +808,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (payload.availability) prev.availability = payload.availability;
                     if (payload.blockedDates !== undefined) prev.blockedDates = payload.blockedDates;
                     if (payload.settings) prev.settings = { ...(prev.settings || {}), ...payload.settings };
+                    prev._savedAt = Date.now();
                     localStorage.setItem('trikaldarshi_config', JSON.stringify(prev));
                 } catch (cacheErr) {
                     try { localStorage.removeItem('trikaldarshi_config'); } catch (ex) {}
