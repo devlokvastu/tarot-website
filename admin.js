@@ -207,7 +207,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (document.getElementById('content-review3-author')) document.getElementById('content-review3-author').value = c.reviews[2].author;
                 }
 
-                // 6. Footer & Legal
+                // 6. All Page Buttons & CTAs
+                if (c.planCardBtnText && document.getElementById('content-plan-btn-text')) document.getElementById('content-plan-btn-text').value = c.planCardBtnText;
+                if (c.offerHeroCtaText && document.getElementById('content-offer-hero-cta')) document.getElementById('content-offer-hero-cta').value = c.offerHeroCtaText;
+                if (c.offerCardBtnText && document.getElementById('content-offer-card-cta')) document.getElementById('content-offer-card-cta').value = c.offerCardBtnText;
+                if (c.bookingNextBtnText && document.getElementById('content-booking-next-btn')) document.getElementById('content-booking-next-btn').value = c.bookingNextBtnText;
+                if (c.bookingPayBtnText && document.getElementById('content-booking-pay-btn')) document.getElementById('content-booking-pay-btn').value = c.bookingPayBtnText;
+                if (c.successHomeBtnText && document.getElementById('content-success-home-btn')) document.getElementById('content-success-home-btn').value = c.successHomeBtnText;
+
+                // 7. Footer & Legal
                 if (c.footerCopyright && document.getElementById('content-footer-copyright')) document.getElementById('content-footer-copyright').value = c.footerCopyright;
             }
             
@@ -919,6 +927,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                             author: document.getElementById('content-review3-author')?.value.trim() || "- Priya S."
                         }
                     ],
+                    planCardBtnText: document.getElementById('content-plan-btn-text')?.value.trim() || "Book Now",
+                    offerHeroCtaText: document.getElementById('content-offer-hero-cta')?.value.trim() || "Claim Exclusive Offer",
+                    offerCardBtnText: document.getElementById('content-offer-card-cta')?.value.trim() || "Book Exclusive Session",
+                    bookingNextBtnText: document.getElementById('content-booking-next-btn')?.value.trim() || "Next",
+                    bookingPayBtnText: document.getElementById('content-booking-pay-btn')?.value.trim() || "Pay ₹{price} & Confirm Slot",
+                    successHomeBtnText: document.getElementById('content-success-home-btn')?.value.trim() || "Return to Homepage",
                     footerCopyright: document.getElementById('content-footer-copyright')?.value.trim() || "© 2026 Coach Sanjay. All rights reserved."
                 }
             };

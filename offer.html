@@ -798,6 +798,10 @@
                         const heroP = document.querySelector('.hero p');
                         if (heroP) heroP.innerText = c.bioText;
                     }
+                    if (c.offerHeroCtaText) {
+                        const offerHeroBtn = document.querySelector('.hero .cta-button');
+                        if (offerHeroBtn) offerHeroBtn.textContent = c.offerHeroCtaText;
+                    }
                     if (c.socialProofText) {
                         const socialProof = document.querySelector('.social-proof');
                         if (socialProof) socialProof.innerText = c.socialProofText;
@@ -821,6 +825,7 @@
                 }
 
                 // 2. Unlisted Plan Details Sync
+                const offerCardBtnPrefix = (db.content && db.content.offerCardBtnText) ? db.content.offerCardBtnText.trim() : 'Book Exclusive Session';
                 if (db.unlistedPlan) {
                     const p = db.unlistedPlan;
                     if (p.name) document.getElementById('offer-plan-name').innerText = p.name;
@@ -828,7 +833,9 @@
                     if (p.desc) document.getElementById('offer-plan-desc').innerText = p.desc;
                     if (p.price) {
                         document.getElementById('offer-plan-price').innerText = `₹${p.price}`;
-                        document.getElementById('main-offer-btn').innerText = `Book Exclusive Session • ₹${p.price}`;
+                        document.getElementById('main-offer-btn').innerText = `${offerCardBtnPrefix} • ₹${p.price}`;
+                    } else if (db.content && db.content.offerCardBtnText) {
+                        document.getElementById('main-offer-btn').innerText = `${offerCardBtnPrefix} • ₹49`;
                     }
                     if (p.originalPrice) {
                         document.getElementById('offer-plan-orig-price').innerText = `₹${p.originalPrice}`;

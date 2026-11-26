@@ -6,6 +6,7 @@
     <title>Payment Confirmed | TrikalDarshi Tarot</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css"> <!-- Cosmic background -->
+    <script src="api-client.js"></script>
     <style>
         .success-page {
             display: flex;
@@ -62,7 +63,7 @@
         <h1 id="status-title">Payment Received, Booking Confirmed</h1>
         <p id="status-desc">Thank you so much for your booking. You will receive a call on your contact number exactly at your scheduled time.</p>
         <p id="status-ref" style="display:none; font-size:0.88rem; opacity:0.85; margin-top:-10px; margin-bottom:20px;"></p>
-        <a href="index.html" class="home-btn">Return to Homepage</a>
+        <a href="index.html" class="home-btn" id="home-btn">Return to Homepage</a>
     </div>
     <script>
         (function () {
@@ -91,6 +92,17 @@
                     refEl.style.display = 'block';
                 }
             }
+
+            function applyBtn(cfg) {
+                const txt = cfg && cfg.content && cfg.content.successHomeBtnText;
+                const homeBtn = document.getElementById('home-btn');
+                if (homeBtn && txt && txt.trim()) homeBtn.textContent = txt.trim();
+            }
+            try {
+                const cached = localStorage.getItem('trikaldarshi_config');
+                if (cached) applyBtn(JSON.parse(cached));
+            } catch (e) {}
+            fetch('/api/config').then(r => r.json()).then(applyBtn).catch(() => {});
         })();
     </script>
 </body>

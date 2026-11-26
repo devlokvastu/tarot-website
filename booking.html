@@ -169,6 +169,24 @@
         const urlParams = new URLSearchParams(window.location.search);
         const planId = urlParams.get('plan') || '0';
 
+        function getBookingNextBtnText() {
+            const c = window.siteConfig && window.siteConfig.content;
+            return (c && c.bookingNextBtnText && c.bookingNextBtnText.trim()) || 'Next';
+        }
+
+        function setPayBtnContent(btn, price) {
+            if (!btn) return;
+            const c = window.siteConfig && window.siteConfig.content;
+            const tpl = (c && c.bookingPayBtnText && c.bookingPayBtnText.trim()) || 'Pay ₹{price} & Confirm Slot';
+            const label = tpl.includes('{price}') ? tpl.replace(/\{price\}/g, String(price)) : `${tpl} • ₹${price}`;
+            btn.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fa-solid fa-lock';
+            icon.style.marginRight = '6px';
+            btn.appendChild(icon);
+            btn.appendChild(document.createTextNode(' ' + label));
+        }
+
         // Load Plan Header dynamically
         function applyPlanHeader(db) {
             if (!db) return;
@@ -196,6 +214,11 @@
             }
             if (db.content && db.content.siteName) {
                 document.title = `Select Timing | ${db.content.siteName}`;
+            }
+            const step1 = document.getElementById('step-1');
+            const mainBtn = document.getElementById('main-action-btn');
+            if (mainBtn && step1 && step1.style.display !== 'none') {
+                mainBtn.textContent = getBookingNextBtnText();
             }
         }
 
@@ -372,7 +395,7 @@
             
             const price = getPlanPriceFormatted();
             const btn = document.getElementById('main-action-btn');
-            btn.innerHTML = `<i class="fa-solid fa-lock" style="margin-right:6px;"></i> Pay ₹${price} & Confirm Slot`;
+            setPayBtnContent(btn, price);
             btn.setAttribute('onclick', 'startRazorpayPayment(this)');
             btn.disabled = false;
             btn.style.opacity = '1';
@@ -392,7 +415,7 @@
             document.getElementById('step-1').style.display = 'block';
             
             const btn = document.getElementById('main-action-btn');
-            btn.innerText = 'Next';
+            btn.textContent = getBookingNextBtnText();
             btn.setAttribute('onclick', 'goToStep2()');
         }
 
@@ -450,7 +473,7 @@
 
             const price = getPlanPriceFormatted();
             const resetBtn = () => {
-                btn.innerHTML = `<i class="fa-solid fa-lock" style="margin-right:6px;"></i> Pay ₹${price} & Confirm Slot`;
+                setPayBtnContent(btn, price);
                 btn.style.opacity = '1';
                 btn.style.pointerEvents = 'auto';
             };

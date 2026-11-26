@@ -210,6 +210,7 @@
                 }
 
                 // 2. Pricing Plans: only rebuild if cards don't match db.plans
+                const planBtnPrefix = (db.content && db.content.planCardBtnText) ? db.content.planCardBtnText.trim() : 'Book Now';
                 if (db.plans && db.plans.length > 0) {
                     const container = document.querySelector('.plans-container');
                     if (container) {
@@ -222,8 +223,9 @@
                                 const titleEl = card.querySelector('.plan-title');
                                 const btnEl = card.querySelector('.plan-btn');
                                 const durEl = card.querySelector('.plan-duration');
+                                const expectedBtn = `${planBtnPrefix} • ₹${plan.price}`;
                                 if (!titleEl || titleEl.innerText !== plan.name || 
-                                    !btnEl || !btnEl.innerText.includes(plan.price) ||
+                                    !btnEl || btnEl.innerText.trim() !== expectedBtn ||
                                     !durEl || !durEl.innerText.includes(plan.duration || '30')) {
                                     needsRebuild = true;
                                     break;
@@ -232,6 +234,11 @@
                         }
 
                         if (needsRebuild) {
+                            const escHtml = (s) => {
+                                const d = document.createElement('div');
+                                d.textContent = String(s || '');
+                                return d.innerHTML;
+                            };
                             container.innerHTML = db.plans.map((plan, index) => {
                                 const isPopular = index === 1;
                                 const planDuration = plan.duration || '30';
@@ -239,16 +246,16 @@
                                     <div class="plan-card ${isPopular ? 'popular' : ''}" data-plan-index="${index}">
                                         ${isPopular ? '<div class="badge">Most Popular</div>' : ''}
                                         <div class="plan-header">
-                                            <h3 class="plan-title">${plan.name}</h3>
-                                            <p class="plan-desc">${plan.desc}</p>
+                                            <h3 class="plan-title">${escHtml(plan.name)}</h3>
+                                            <p class="plan-desc">${escHtml(plan.desc)}</p>
                                         </div>
                                         <div class="plan-divider"></div>
                                         <div class="plan-footer">
                                             <div class="plan-duration">
-                                                <span>⏱️</span> <span>${planDuration} Mins Session</span>
+                                                <span>⏱️</span> <span>${escHtml(planDuration)} Mins Session</span>
                                             </div>
                                             <button class="plan-btn" onclick="window.location.href='booking.html?plan=${index}'">
-                                                Book Now • ₹${plan.price}
+                                                ${escHtml(planBtnPrefix)} • ₹${escHtml(plan.price)}
                                             </button>
                                         </div>
                                     </div>
