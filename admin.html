@@ -362,13 +362,13 @@
                         </div>
                     </div>
 
-                    <!-- 2. Hero Section (Home Page Top) -->
+                    <!-- 2. Hero Section (Primary Landing Page — index.html) -->
                     <div class="card cms-section-card">
                         <div class="cms-section-header">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                             <div>
-                                <h3>Hero Section (Landing Page Top)</h3>
-                                <p>The main headline, bio introduction, button text, and social proof badge.</p>
+                                <h3>Primary Landing Page — Hero Section (index.html)</h3>
+                                <p>Headline, bio, hero button text, and social proof shown on your main home page.</p>
                             </div>
                         </div>
 
@@ -384,8 +384,8 @@
 
                         <div class="form-row-2">
                             <div class="form-group">
-                                <label for="content-hero-cta">Hero Button Text</label>
-                                <input type="text" id="content-hero-cta" class="form-control" value="Book Your Session" placeholder="e.g. Book Now">
+                                <label for="content-hero-cta">Primary Hero Button (index.html)</label>
+                                <input type="text" id="content-hero-cta" class="form-control" value="Book Your Session" placeholder="e.g. Book Your Session">
                             </div>
                             <div class="form-group">
                                 <label for="content-social-proof">Social Proof / Trust Badge</label>
@@ -394,13 +394,13 @@
                         </div>
                     </div>
 
-                    <!-- 3. Readings & Plans Section Copy -->
+                    <!-- 3. Readings & Plans Section Copy (Primary Landing Page — index.html) -->
                     <div class="card cms-section-card">
                         <div class="cms-section-header">
                             <i class="fa-solid fa-layer-group"></i>
                             <div>
-                                <h3>Readings & Plans Section Copy</h3>
-                                <p>Control the heading and tagline displayed above the pricing cards.</p>
+                                <h3>Primary Landing Page — Readings &amp; Plans Section (index.html)</h3>
+                                <p>Control the heading, tagline, and plan card button text on your main home page.</p>
                             </div>
                         </div>
 
@@ -414,16 +414,21 @@
                                 <input type="text" id="content-plans-subheading" class="form-control" value="Get the clarity you need, with the right guidance for your journey." placeholder="e.g. Get the clarity you need, with the right guidance for your journey.">
                             </div>
                         </div>
-                        <p style="font-size: 0.8rem; color: #9ca3af; margin: 0;"><i class="fa-solid fa-circle-info"></i> Note: To edit individual tier prices, durations, and bullet features, use the <strong>Plan Editor</strong> tab in the sidebar.</p>
+                        <div class="form-group">
+                            <label for="content-plan-btn-text">Plan Card Button Text (index.html)</label>
+                            <input type="text" id="content-plan-btn-text" class="form-control" value="Book Now" placeholder="e.g. Book Now">
+                            <small style="color:#9ca3af; font-size:0.75rem;">Price is added automatically (e.g. <em>Book Now • ₹349</em>), or use <code>{price}</code> to control exact placement.</small>
+                        </div>
+                        <p style="font-size: 0.8rem; color: #9ca3af; margin: 0;"><i class="fa-solid fa-circle-info"></i> Note: To edit individual tier prices, durations, or your standalone <strong>Exclusive Offer Page (offer.html)</strong> buttons, use the <strong>Plan Editor</strong> tab in the sidebar.</p>
                     </div>
 
-                    <!-- 4. Booking Screen Copy -->
+                    <!-- 4. Booking & Confirmation Pages (booking.html & success.html) -->
                     <div class="card cms-section-card">
                         <div class="cms-section-header">
                             <i class="fa-regular fa-calendar-check"></i>
                             <div>
-                                <h3>Booking Screen Copy (booking.html)</h3>
-                                <p>Headlines and trust messaging shown when clients select dates and times.</p>
+                                <h3>Booking &amp; Confirmation Pages (booking.html &amp; success.html)</h3>
+                                <p>Headlines, trust messaging, and all checkout/confirmation buttons.</p>
                             </div>
                         </div>
 
@@ -438,9 +443,26 @@
                             </div>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group">
                             <label for="content-booking-trust">Bottom Trust Banner</label>
                             <input type="text" id="content-booking-trust" class="form-control" value="REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY" placeholder="e.g. REAL GUIDANCE ✦ DEEPER INSIGHTS ✦ YOUR JOURNEY">
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="content-booking-next-btn">Step 1 Next Button (booking.html)</label>
+                                <input type="text" id="content-booking-next-btn" class="form-control" value="Next" placeholder="e.g. Next / Continue">
+                            </div>
+                            <div class="form-group">
+                                <label for="content-booking-pay-btn">Step 2 Payment Button (booking.html)</label>
+                                <input type="text" id="content-booking-pay-btn" class="form-control" value="Pay ₹{price} &amp; Confirm Slot" placeholder="e.g. Pay ₹{price} &amp; Confirm Slot">
+                                <small style="color:#9ca3af; font-size:0.75rem;">Keep <code>{price}</code> where the amount should appear.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="content-success-home-btn">Confirmation Page Home Button (success.html)</label>
+                            <input type="text" id="content-success-home-btn" class="form-control" value="Return to Homepage" placeholder="e.g. Return to Homepage">
                         </div>
                     </div>
 
@@ -499,55 +521,7 @@
                         </div>
                     </div>
 
-                    <!-- 6. All Page Buttons & CTAs -->
-                    <div class="card cms-section-card">
-                        <div class="cms-section-header">
-                            <i class="fa-solid fa-hand-pointer"></i>
-                            <div>
-                                <h3>Buttons &amp; Call-to-Action Labels</h3>
-                                <p>Customize button text across your Home, Special Offer, Booking, and Confirmation pages.</p>
-                            </div>
-                        </div>
-
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label for="content-plan-btn-text">Plan Card Button Prefix (index.html)</label>
-                                <input type="text" id="content-plan-btn-text" class="form-control" value="Book Now" placeholder="e.g. Book Now">
-                                <small style="color:#9ca3af; font-size:0.75rem;">Displays as: <em>Label • ₹Price</em></small>
-                            </div>
-                            <div class="form-group">
-                                <label for="content-offer-hero-cta">Offer Page Hero Button (offer.html)</label>
-                                <input type="text" id="content-offer-hero-cta" class="form-control" value="Claim Exclusive Offer" placeholder="e.g. Claim Exclusive Offer">
-                            </div>
-                        </div>
-
-                        <div class="form-row-2">
-                            <div class="form-group">
-                                <label for="content-offer-card-cta">Offer Card Button Prefix (offer.html)</label>
-                                <input type="text" id="content-offer-card-cta" class="form-control" value="Book Exclusive Session" placeholder="e.g. Book Exclusive Session">
-                                <small style="color:#9ca3af; font-size:0.75rem;">Displays as: <em>Label • ₹Price</em></small>
-                            </div>
-                            <div class="form-group">
-                                <label for="content-booking-next-btn">Booking Step 1 Button (booking.html)</label>
-                                <input type="text" id="content-booking-next-btn" class="form-control" value="Next" placeholder="e.g. Next / Continue">
-                            </div>
-                        </div>
-
-                        <div class="form-row-2">
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label for="content-booking-pay-btn">Booking Payment Button (booking.html)</label>
-                                <input type="text" id="content-booking-pay-btn" class="form-control" value="Pay ₹{price} &amp; Confirm Slot" placeholder="e.g. Pay ₹{price} &amp; Confirm Slot">
-                                <small style="color:#9ca3af; font-size:0.75rem;">Keep <code>{price}</code> where the amount should appear.</small>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 0;">
-                                <label for="content-success-home-btn">Confirmation Page Button (success.html)</label>
-                                <input type="text" id="content-success-home-btn" class="form-control" value="Return to Homepage" placeholder="e.g. Return to Homepage">
-                            </div>
-                        </div>
-                        <p style="font-size: 0.78rem; color: #9ca3af; margin: 12px 0 0;"><i class="fa-solid fa-circle-info"></i> Hero top button is in <strong>Hero Section</strong> above; sticky offer bar button is in <strong>Plan Editor &rarr; Fixed Bottom Bar Settings</strong>.</p>
-                    </div>
-
-                    <!-- 7. Footer & Legal -->
+                    <!-- 6. Footer & Legal -->
                     <div class="card cms-section-card">
                         <div class="cms-section-header">
                             <i class="fa-solid fa-copyright"></i>
@@ -792,6 +766,18 @@ Priority Support</textarea>
 Immediate Guidance on Urgent Life Decisions
 Personalized Remedies &amp; Guidance
 100% Confidential Live Video / Audio Session</textarea>
+                            </div>
+
+                            <div class="form-row-2">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="content-offer-hero-cta">Offer Top Hero Button (offer.html)</label>
+                                    <input type="text" class="form-control" id="content-offer-hero-cta" value="Claim Exclusive Offer" placeholder="e.g. Claim Exclusive Offer">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="content-offer-card-cta">Offer Plan Card Button (offer.html)</label>
+                                    <input type="text" class="form-control" id="content-offer-card-cta" value="Book Exclusive Session" placeholder="e.g. Book Free Session">
+                                    <small style="color:#9ca3af; font-size:0.74rem;">Price adds automatically unless <code>₹</code> or <code>{price}</code> is included.</small>
+                                </div>
                             </div>
                         </div>
 
@@ -1294,6 +1280,10 @@ Personalized Remedies &amp; Guidance
                     bullet2: document.getElementById('unlisted-bullet-2')?.value || "Confidential & Live Consultation",
                     bullet3: document.getElementById('unlisted-bullet-3')?.value || "Limited Slots Available Today",
                     ctaText: document.getElementById('unlisted-cta-text')?.value || "ENROLL NOW"
+                },
+                content: {
+                    offerHeroCtaText: document.getElementById('content-offer-hero-cta')?.value.trim() || "Claim Exclusive Offer",
+                    offerCardBtnText: document.getElementById('content-offer-card-cta')?.value.trim() || "Book Exclusive Session"
                 }
             };
 
@@ -1308,6 +1298,14 @@ Personalized Remedies &amp; Guidance
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
+                    try {
+                        const prev = JSON.parse(localStorage.getItem('trikaldarshi_config') || '{}');
+                        prev.unlistedPlan = { ...(prev.unlistedPlan || {}), ...payload.unlistedPlan };
+                        prev.content = { ...(prev.content || {}), ...payload.content };
+                        localStorage.setItem('trikaldarshi_config', JSON.stringify(prev));
+                    } catch (e) {
+                        try { localStorage.removeItem('trikaldarshi_config'); } catch (ex) {}
+                    }
                     btn.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> Saved Successfully!';
                     btn.style.background = '#10b981';
                     setTimeout(() => {

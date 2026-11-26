@@ -800,6 +800,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body: JSON.stringify(payload)
             });
             if (res.ok) {
+                try {
+                    const prev = JSON.parse(localStorage.getItem('trikaldarshi_config') || '{}');
+                    if (payload.content) prev.content = { ...(prev.content || {}), ...payload.content };
+                    if (payload.plans) prev.plans = payload.plans;
+                    if (payload.unlistedPlan) prev.unlistedPlan = { ...(prev.unlistedPlan || {}), ...payload.unlistedPlan };
+                    if (payload.availability) prev.availability = payload.availability;
+                    if (payload.blockedDates !== undefined) prev.blockedDates = payload.blockedDates;
+                    if (payload.settings) prev.settings = { ...(prev.settings || {}), ...payload.settings };
+                    localStorage.setItem('trikaldarshi_config', JSON.stringify(prev));
+                } catch (cacheErr) {
+                    try { localStorage.removeItem('trikaldarshi_config'); } catch (ex) {}
+                }
                 btnList.forEach(b => {
                     b.innerHTML = '<i class="fa-solid fa-circle-check"></i> Saved Successfully!';
                     b.style.background = '#10b981';

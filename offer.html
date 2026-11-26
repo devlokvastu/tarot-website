@@ -826,6 +826,11 @@
 
                 // 2. Unlisted Plan Details Sync
                 const offerCardBtnPrefix = (db.content && db.content.offerCardBtnText) ? db.content.offerCardBtnText.trim() : 'Book Exclusive Session';
+                const formatOfferBtnText = (prefix, price) => {
+                    if (prefix.includes('{price}')) return prefix.replace(/\{price\}/g, String(price));
+                    if (prefix.includes('₹')) return prefix;
+                    return `${prefix} • ₹${price}`;
+                };
                 if (db.unlistedPlan) {
                     const p = db.unlistedPlan;
                     if (p.name) document.getElementById('offer-plan-name').innerText = p.name;
@@ -833,9 +838,9 @@
                     if (p.desc) document.getElementById('offer-plan-desc').innerText = p.desc;
                     if (p.price) {
                         document.getElementById('offer-plan-price').innerText = `₹${p.price}`;
-                        document.getElementById('main-offer-btn').innerText = `${offerCardBtnPrefix} • ₹${p.price}`;
+                        document.getElementById('main-offer-btn').innerText = formatOfferBtnText(offerCardBtnPrefix, p.price);
                     } else if (db.content && db.content.offerCardBtnText) {
-                        document.getElementById('main-offer-btn').innerText = `${offerCardBtnPrefix} • ₹49`;
+                        document.getElementById('main-offer-btn').innerText = formatOfferBtnText(offerCardBtnPrefix, '49');
                     }
                     if (p.originalPrice) {
                         document.getElementById('offer-plan-orig-price').innerText = `₹${p.originalPrice}`;
